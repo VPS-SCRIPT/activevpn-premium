@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VPN Admin Panel (Device ID)</title>
+    <!-- ဒီဇိုင်းအတွက် Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Firebase ကို တိုက်ရိုက်အလုပ်လုပ်စေမည့် Script များ (Module မလိုတော့ပါ) -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-database-compat.js"></script>
+</head>
+<body class="bg-gray-100 p-6">
+
+    <div class="max-w-6xl mx-auto">
+        <h1 class="text-3xl font-bold text-center text-blue-600 mb-8">VPN Premium User (Device ID) စီမံခန့်ခွဲမှု</h1>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            
+            <!-- User အသစ်ထည့်ရန် Form -->
+            <div class="bg-white p-6 rounded-lg shadow-md col-span-1 h-fit">
+                <h2 class="text-xl font-semibold mb-4 text-gray-700">Device ID အသစ်ထည့်ရန်</h2>
+                <form id="addUserForm" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-600">အမည် (Name)</label>
+                        <input type="text" id="userName" placeholder="ဥပမာ - ကိုကျော်" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-600">Device ID</label>
+                        <input type="text" id="deviceId" placeholder="ဥပမာ - dfc56c9781edf3e4" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-600">သက်တမ်းကုန်မည့်ရက် (Expire Date)</label>
+                        <input type="date" id="expireDate" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    <button type="submit" class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition duration-300">
+                        Premium ပေးမည်
+                    </button>
+                </form>
+            </div>
+
+            <!-- User စာရင်းပြသမည့် ဇယား -->
+            <div class="bg-white p-6 rounded-lg shadow-md col-span-2">
+                <h2 class="text-xl font-semibold mb-4 text-gray-700">Premium ပေးထားသော Device များ</h2>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">အမည်</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Device ID</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Expire Date</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="userTableBody" class="bg-white divide-y divide-gray-200">
+                            <!-- Data များကို JS ဖြင့် ဤနေရာတွင် ထည့်သွင်းပါမည် -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Firebase လုပ်ဆောင်ချက်များ -->
+    <script>
+        // သင်ပေးထားသော Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBmvehentAfiAK1pECzIHLTvqNELrVurBY",
+            authDomain: "activevpn-premium.firebaseapp.com",
+            projectId: "activevpn-premium",
+            storageBucket: "activevpn-premium.firebasestorage.app",
+            messagingSenderId: "847165419862",
+            appId: "1:847165419862:web:7c74d6d4a4b66f83d066f7",
+            measurementId: "G-VBBE57WGC3"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        // Form Submit လုပ်သောအခါ Data ထည့်ခြင်း
+        document.getElementById('addUserForm').addEventListener('submit', function(e) {
+            e.preventDefault(); // Page Refresh မဖြစ်အောင်တားခြင်း
+            
+            const name = document.getElementById('userName').value.trim();
+            const deviceId = document.getElementById('deviceId').value.trim();
+            const expireDate = document.getElementById('expireDate').value;
+
+            // Device ID တွင် အထူးသင်္ကေတများပါပါက စစ်ဆေးခြင်း
+            if(deviceId.includes('.') || deviceId.includes('#') || deviceId.includes('$') || deviceId.includes('[') || deviceId.includes(']')) {
+                alert("Device ID တွင် အထူးသင်္ကေတများ (., #, $, [, ]) မပါဝင်ရပါ။");
+                return;
+            }
+
+            // Button နှိပ်လိုက်ကြောင်း သိစေရန်
+            const submitBtn = this.querySelector('button[type="submit"]');
+            submitBtn.innerHTML = "ထည့်သွင်းနေပါသည်...";
+            submitBtn.disabled = true;
+
+            // Firebase သို့ Data လှမ်းပို့ခြင်း
+            db.ref('premium_users/' + deviceId).set({
+                name: name,
+                device_id: deviceId,
+                expire_date: expireDate,
+                is_premium: true
+            }).then(() => {
+                alert("အောင်မြင်ပါသည်။ User အသစ် ထည့်သွင်းပြီးပါပြီ။");
+                document.getElementById('addUserForm').reset();
+            }).catch((error) => {
+                alert("အမှားအယွင်းဖြစ်ပေါ်နေပါသည်: " + error.message);
+            }).finally(() => {
+                // Button ကို မူလအတိုင်း ပြန်ထားခြင်း
+                submitBtn.innerHTML = "Premium ပေးမည်";
+                submitBtn.disabled = false;
+            });
+        });
+
+        // Firebase မှ Data များကို Realtime ဖတ်ခြင်း
+        db.ref('premium_users').on('value', (snapshot) => {
+            const tbody = document.getElementById('userTableBody');
+            tbody.innerHTML = ''; 
+
+            const data = snapshot.val();
+            
+            if (data) {
+                Object.keys(data).forEach(key => {
+                    const user = data[key];
+                    const row = `
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${user.name || '-'}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${user.device_id || key}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${user.expire_date}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                <button onclick="deleteDevice('${key}')" class="text-red-600 hover:text-red-900 bg-red-100 px-3 py-1 rounded-md">ဖျက်မည်</button>
+                            </td>
+                        </tr>
+                    `;
+                    tbody.innerHTML += row;
+                });
+            } else {
+                tbody.innerHTML = '<tr><td colspan="4" class="px-6 py-4 text-center text-sm text-gray-500">Premium ပေးထားသော Device မရှိသေးပါ။</td></tr>';
+            }
+        });
+
+        // Device ကို ဖျက်ရန် Function
+        function deleteDevice(deviceId) {
+            if(confirm(deviceId + " ကို Premium စာရင်းမှ ဖျက်ရန် သေချာပါသလား?")) {
+                db.ref('premium_users/' + deviceId).remove().then(() => {
+                    // အောင်မြင်စွာ ဖျက်ပြီးပါပြီ
+                }).catch((error) => {
+                    alert("ဖျက်ရာတွင် အမှားဖြစ်နေပါသည်: " + error.message);
+                });
+            }
+        }
+    </script>
+</body>
+</html>
