@@ -1,0 +1,1357 @@
+<!DOCTYPE html>
+<html lang="my" class="dark">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0"
+>
+
+<title>ACTIVE VPN Admin Panel Pro</title>
+
+<meta name="theme-color" content="#020617">
+
+<script src="https://cdn.tailwindcss.com"></script>
+
+<script>
+tailwind.config = {
+    darkMode: 'class'
+};
+</script>
+
+<link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+<script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
+
+<script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-database-compat.js"></script>
+
+
+<style>
+
+/* =========================================================
+   GLOBAL STYLES
+========================================================= */
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    min-height: 100vh;
+}
+
+
+/* =========================================================
+   CUSTOM SCROLLBAR
+========================================================= */
+
+::-webkit-scrollbar {
+    width: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #475569;
+    border-radius: 8px;
+}
+
+
+/* =========================================================
+   TICKET NOTCH (လက်မှတ်အစွန်းဝိုင်းပုံစံ)
+========================================================= */
+
+.ticket-notch {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 27px;
+    height: 27px;
+    border-radius: 50%;
+    background: #020617;
+    border: 2px solid rgba(59,130,246,0.42);
+    z-index: 30;
+}
+
+.ticket-notch-left {
+    left: -14px;
+}
+
+.ticket-notch-right {
+    right: -14px;
+}
+
+
+/* =========================================================
+   RECEIPT CARD CONTAINER
+========================================================= */
+
+#receiptCardToCapture {
+    width: 100%;
+    max-width: 420px;
+    margin: 0 auto;
+    padding: 0;
+    background: #020617 !important;
+    border-radius: 24px;
+    position: relative;
+    overflow: visible !important;
+    border: 2px solid rgba(59,130,246,0.40);
+    box-shadow: none !important;
+    outline: none !important;
+}
+
+
+/* =========================================================
+   RECEIPT INNER CONTENT
+========================================================= */
+
+.receipt-inner {
+    padding: 22px;
+    background: #020617 !important;
+    border-radius: 22px;
+    overflow: visible;
+}
+
+
+/* =========================================================
+   HEADER SECTION
+========================================================= */
+
+.receipt-header {
+    text-align: center;
+    padding-bottom: 17px;
+    border-bottom: 1px solid rgba(59,130,246,0.25);
+}
+
+.receipt-logo {
+    width: 64px;
+    height: 64px;
+    object-fit: contain;
+    display: block;
+    margin: 0 auto 9px auto;
+    border-radius: 50%;
+}
+
+.receipt-title {
+    margin: 0;
+    color: #fbbf24;
+    font-size: 23px;
+    line-height: 1.15;
+    font-weight: 900;
+    letter-spacing: 0.035em;
+}
+
+.receipt-subtitle {
+    margin: 7px 0 0 0;
+    color: #34d399;
+    font-size: 10px;
+    line-height: 1.2;
+    font-family: monospace;
+    letter-spacing: 0.19em;
+}
+
+
+/* =========================================================
+   USER DETAILS ROWS
+========================================================= */
+
+.receipt-details {
+    margin-top: 14px;
+    border-bottom: 1px solid rgba(30,41,59,0.8);
+}
+
+.receipt-row {
+    display: grid;
+    grid-template-columns: 145px minmax(0, 1fr);
+    align-items: center;
+    min-height: 48px;
+    border-bottom: 1px solid rgba(30,41,59,0.78);
+    gap: 8px;
+}
+
+.receipt-row:last-child {
+    border-bottom: none;
+}
+
+
+/* =========================================================
+   LABEL & ICON
+========================================================= */
+
+.receipt-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #94a3b8;
+    font-size: 12px;
+    font-weight: 800;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.receipt-label i {
+    width: 25px;
+    flex: 0 0 25px;
+    text-align: center;
+    color: #60a5fa;
+    font-size: 17px;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+
+/* =========================================================
+   VALUE TEXT
+========================================================= */
+
+.receipt-value {
+    min-width: 0;
+    text-align: right;
+    color: #f8fafc;
+    font-size: 14px;
+    font-weight: 800;
+    overflow-wrap: anywhere;
+}
+
+.receipt-value.key {
+    color: #fcd34d;
+    font-family: "Courier New", monospace;
+    font-size: 13px;
+    letter-spacing: 0.035em;
+}
+
+/* Price တန်ဖိုးအား အစိမ်းရောင် ပြောင်းလဲထားခြင်း */
+.receipt-value.price-value {
+    color: #34d399 !important;
+    font-weight: 900;
+    font-size: 14px;
+}
+
+
+/* =========================================================
+   PAYMENT SECTION (PERFECTLY ALIGNED ICONS & SPACING)
+========================================================= */
+
+.payment-section {
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 1px dashed rgba(59,130,246,0.35);
+}
+
+.payment-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    gap: 16px;
+    padding: 0 4px;
+}
+
+.payment-qr {
+    width: 85px !important;
+    height: 85px !important;
+    min-width: 85px !important;
+    min-height: 85px !important;
+    object-fit: contain;
+    display: block;
+    flex: 0 0 85px;
+    padding: 3px;
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 10px;
+}
+
+.bank-details {
+    min-width: 0;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+/* ICON BOX UNIFORMITY */
+.icon-box {
+    width: 28px;
+    height: 28px;
+    min-width: 28px;
+    min-height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 28px;
+}
+
+.payment-title-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #fbbf24;
+    font-size: 14px;
+    font-weight: 900;
+    line-height: 1;
+    margin-bottom: 6px;
+}
+
+.payment-title-row i {
+    color: #fbbf24;
+    font-size: 17px;
+}
+
+.bank-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    margin-bottom: 2px;
+}
+
+.bank-logo {
+    width: 28px !important;
+    height: 28px !important;
+    min-width: 28px !important;
+    min-height: 28px !important;
+    object-fit: contain;
+    display: block;
+    border-radius: 50%;
+}
+
+.bank-name {
+    display: flex;
+    align-items: center;
+    color: #94a3b8;
+    font-size: 11px;
+    line-height: 1;
+    font-weight: 900;
+    letter-spacing: 0.03em;
+    white-space: nowrap;
+    margin: 0;
+}
+
+/* ဘဏ်နံပါတ် အပြင်အဆင်နှင့် နာမည်နှင့် မကပ်စေရန် သီးသန့် ခွာပေးထားခြင်း */
+.bank-number {
+    color: #fcd34d;
+    font-family: "Courier New", monospace;
+    font-size: 16px;
+    line-height: 1.1;
+    font-weight: 900;
+    letter-spacing: 0.06em;
+    white-space: nowrap;
+    padding-left: 36px;
+    margin-top: 2px;
+    margin-bottom: 5px; /* အောက်က နာမည်နှင့် မကပ်ဘဲ အကွာအဝေး ညီစေရန် */
+}
+
+.bank-owner {
+    color: #ffffff;
+    font-size: 11px;
+    line-height: 1.1;
+    font-weight: 800;
+    white-space: nowrap;
+    letter-spacing: 0.02em;
+    padding-left: 36px;
+    margin-top: 0px;
+}
+
+
+/* =========================================================
+   FOOTER & BARCODE
+========================================================= */
+
+.receipt-footer {
+    margin-top: 16px;
+    padding-top: 12px;
+    border-top: 1px dashed rgba(59,130,246,0.35);
+    text-align: center;
+    background: transparent !important;
+}
+
+.barcode {
+    height: 33px;
+    display: flex;
+    align-items: stretch;
+    justify-content: center;
+    gap: 3px;
+    opacity: 0.65;
+    margin-bottom: 10px;
+    background: transparent !important;
+}
+
+.barcode span {
+    display: block;
+    height: 100%;
+    background: #ffffff;
+}
+
+.barcode span:nth-child(1) { width: 3px; }
+.barcode span:nth-child(2) { width: 2px; }
+.barcode span:nth-child(3) { width: 6px; }
+.barcode span:nth-child(4) { width: 2px; }
+.barcode span:nth-child(5) { width: 8px; }
+.barcode span:nth-child(6) { width: 3px; }
+.barcode span:nth-child(7) { width: 5px; }
+.barcode span:nth-child(8) { width: 2px; }
+.barcode span:nth-child(9) { width: 7px; }
+.barcode span:nth-child(10) { width: 3px; }
+.barcode span:nth-child(11) { width: 5px; }
+.barcode span:nth-child(12) { width: 2px; }
+.barcode span:nth-child(13) { width: 8px; }
+.barcode span:nth-child(14) { width: 3px; }
+.barcode span:nth-child(15) { width: 5px; }
+.barcode span:nth-child(16) { width: 2px; }
+
+.thank-you {
+    margin: 0;
+    color: #94a3b8;
+    font-size: 9px;
+    line-height: 1.2;
+    font-family: monospace;
+    letter-spacing: 0.15em;
+}
+
+
+/* =========================================================
+   MODALS & SPINNER
+========================================================= */
+
+.modal-backdrop {
+    background: rgba(15,23,42,0.78);
+    backdrop-filter: blur(8px);
+}
+
+.spinner {
+    border: 3px solid rgba(59,130,246,0.15);
+    border-top-color: #3b82f6;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    animation: spin .7s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+
+/* =========================================================
+   MOBILE RESPONSIVE
+========================================================= */
+
+@media(max-width:480px) {
+    #receiptCardToCapture {
+        max-width: 100%;
+        border-radius: 22px;
+    }
+
+    .receipt-inner {
+        padding: 18px;
+        border-radius: 20px;
+    }
+
+    .receipt-row {
+        grid-template-columns: 125px minmax(0,1fr);
+        min-height: 44px;
+    }
+
+    .receipt-label {
+        font-size: 11px;
+    }
+
+    .receipt-value {
+        font-size: 13px;
+    }
+
+    .payment-qr {
+        width: 78px !important;
+        height: 78px !important;
+        flex: 0 0 78px;
+    }
+
+    .bank-number {
+        font-size: 14px;
+        padding-left: 34px;
+        margin-bottom: 4px;
+    }
+
+    .bank-owner {
+        font-size: 10px;
+        padding-left: 34px;
+    }
+}
+</style>
+
+</head>
+
+
+<body class="bg-slate-100 dark:bg-slate-900 min-h-screen font-sans text-slate-800 dark:text-slate-100">
+
+
+<!-- =========================================================
+     NAVBAR
+========================================================= -->
+
+<nav class="bg-white/90 dark:bg-slate-800/90 backdrop-blur-md shadow-md border-b border-slate-200 dark:border-slate-700/60 sticky top-0 z-30">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between h-16 items-center">
+            <div class="flex items-center gap-3">
+                <img src="https://raw.githubusercontent.com/VPS-SCRIPT/activevpn-premium/main/PNG/1787542085160.png" class="w-10 h-10 object-contain rounded-xl" alt="Logo">
+                <div>
+                    <span class="font-extrabold text-xl text-slate-900 dark:text-white tracking-wide block leading-none">ACTIVE VPN</span>
+                    <span class="text-xs text-blue-600 dark:text-blue-400 font-semibold">Admin Management Panel</span>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-3">
+                <span id="totalUsersCountNav" class="bg-blue-50 dark:bg-slate-700 text-blue-700 dark:text-blue-300 font-bold text-xs py-1.5 px-3.5 rounded-full border border-blue-200 dark:border-slate-600">Total: 0</span>
+                <button onclick="toggleDarkMode()" class="p-2.5 rounded-xl bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-amber-400 border border-slate-300 dark:border-slate-600">
+                    <i id="themeIcon" class="fa-solid fa-moon text-lg"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</nav>
+
+
+<!-- =========================================================
+     MAIN CONTENT AREA
+========================================================= -->
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="flex flex-col lg:flex-row gap-8">
+
+        <!-- ADD USER FORM -->
+        <div class="w-full lg:w-1/3">
+            <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700/60 p-6 sticky top-24">
+                <div class="mb-6 border-b border-slate-100 dark:border-slate-700 pb-4">
+                    <h2 class="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                        <i class="fa-solid fa-user-plus text-blue-600 dark:text-blue-400"></i> အကောင့်အသစ်ထည့်ရန်
+                    </h2>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">ACTIVE VPN Premium အသုံးပြုခွင့်ပေးမည့် အချက်အလက်များဖြည့်ပါ။</p>
+                </div>
+
+                <form id="addUserForm" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">အမည် (User Name)</label>
+                        <input type="text" id="userName" placeholder="ဥပမာ - User 1" required class="w-full rounded-xl bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white py-2.5 px-3 text-sm outline-none border border-slate-300 dark:border-slate-700">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Device ID (Key)</label>
+                        <input type="text" id="deviceId" placeholder="dfc56c9781edf3e4" required class="w-full rounded-xl bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white py-2.5 px-3 text-sm outline-none border border-slate-300 dark:border-slate-700 font-mono">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">စျေးနှုန်း (Price)</label>
+                        <input type="text" id="userPrice" placeholder="ဥပမာ - 100" required class="w-full rounded-xl bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white py-2.5 px-3 text-sm outline-none border border-slate-300 dark:border-slate-700">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">စတင်သည့်ရက် (Start Date)</label>
+                        <input type="date" id="startDate" required class="w-full rounded-xl bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white py-2.5 px-3 text-sm outline-none border border-slate-300 dark:border-slate-700">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">သက်တမ်းကုန်မည့်ရက် (Expire Date)</label>
+                        <input type="date" id="expireDate" required class="w-full rounded-xl bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white py-2.5 px-3 text-sm outline-none border border-slate-300 dark:border-slate-700">
+                    </div>
+
+                    <button type="submit" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold py-3 px-4 rounded-xl shadow-lg flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-bolt"></i>
+                        <span id="submitBtnText">Premium ပေးမည်</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- USER LIST SECTION -->
+        <div class="w-full lg:w-2/3">
+            <div class="mb-6 space-y-4">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <h2 class="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                        <i class="fa-solid fa-users text-blue-600 dark:text-blue-400"></i> Premium အသုံးပြုသူများ
+                    </h2>
+
+                    <div class="relative w-full sm:w-64">
+                        <input type="text" id="searchInput" onkeyup="filterUsers()" placeholder="ရှာဖွေရန်..." class="w-full pl-9 pr-4 py-2 text-sm bg-white dark:bg-slate-800 text-slate-900 dark:text-white rounded-xl border border-slate-300 dark:border-slate-700">
+                        <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-slate-400 text-xs"></i>
+                    </div>
+                </div>
+
+                <div class="flex bg-slate-200 dark:bg-slate-800 p-1.5 rounded-2xl border border-slate-300 dark:border-slate-700 gap-1.5">
+                    <button onclick="switchTab('all')" id="tabAll" class="flex-1 py-2 px-3 rounded-xl text-xs font-bold bg-white dark:bg-slate-700 text-blue-600 dark:text-blue-400 shadow">
+                        Total Users <span id="countAllBadge">0</span>
+                    </button>
+                    <button onclick="switchTab('online')" id="tabOnline" class="flex-1 py-2 px-3 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-400">
+                        Online <span id="countOnlineBadge">0</span>
+                    </button>
+                    <button onclick="switchTab('offline')" id="tabOffline" class="flex-1 py-2 px-3 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-400">
+                        Offline <span id="countOfflineBadge">0</span>
+                    </button>
+                </div>
+            </div>
+
+            <div id="usersGrid" class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div class="col-span-full flex flex-col items-center justify-center py-16 text-slate-400">
+                    <div class="spinner mb-3"></div>
+                    <p class="text-sm">Data များကို ရယူနေပါသည်...</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+<!-- =========================================================
+     EDIT USER MODAL
+========================================================= -->
+
+<div id="editModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div class="absolute inset-0 modal-backdrop" onclick="closeEditModal()"></div>
+    <div class="relative bg-white dark:bg-slate-800 rounded-2xl shadow-2xl w-full max-w-md p-6">
+        <h3 class="text-lg font-bold mb-5">
+            <i class="fa-solid fa-pen-to-square text-blue-600"></i> အကောင့်ပြင်ဆင်ရန်
+        </h3>
+
+        <form id="editUserForm" class="space-y-4">
+            <input type="hidden" id="editOriginalKey">
+            <input type="text" id="editUserName" placeholder="Name" required class="w-full rounded-xl bg-slate-50 dark:bg-slate-900 py-2.5 px-3 text-sm border">
+            <input type="text" id="editDeviceId" placeholder="Device ID" required class="w-full rounded-xl bg-slate-50 dark:bg-slate-900 py-2.5 px-3 text-sm border font-mono">
+            <input type="text" id="editPrice" placeholder="Price (ဥပမာ - 100)" required class="w-full rounded-xl bg-slate-50 dark:bg-slate-900 py-2.5 px-3 text-sm border">
+            <input type="date" id="editStartDate" required class="w-full rounded-xl bg-slate-50 dark:bg-slate-900 py-2.5 px-3 text-sm border">
+            <input type="date" id="editExpireDate" required class="w-full rounded-xl bg-slate-50 dark:bg-slate-900 py-2.5 px-3 text-sm border">
+
+            <div class="flex gap-3">
+                <button type="button" onclick="closeEditModal()" class="flex-1 bg-slate-200 dark:bg-slate-700 py-2.5 rounded-xl">မလုပ်တော့ပါ</button>
+                <button type="submit" class="flex-1 bg-blue-600 text-white font-bold py-2.5 rounded-xl">သိမ်းမည်</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<!-- =========================================================
+     RECEIPT SLIP MODAL
+========================================================= -->
+
+<div id="slipModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto">
+    <div class="absolute inset-0 modal-backdrop" onclick="closeSlipModal()"></div>
+    <div class="relative w-full max-w-md my-auto bg-transparent shadow-none border-none">
+        
+        <div class="flex justify-between items-center mb-3 px-1">
+            <h3 class="text-sm font-bold text-white">
+                <i class="fa-solid fa-ticket"></i> ACTIVE VPN Receipt
+            </h3>
+            <button onclick="closeSlipModal()" class="text-white/70 hover:text-white">
+                <i class="fa-solid fa-xmark text-xl"></i>
+            </button>
+        </div>
+
+        <!-- RECEIPT CARD TO CAPTURE -->
+        <div id="receiptCardToCapture">
+            <div class="ticket-notch ticket-notch-left"></div>
+            <div class="ticket-notch ticket-notch-right"></div>
+
+            <div class="receipt-inner">
+                <!-- HEADER -->
+                <div class="receipt-header">
+                    <img src="https://raw.githubusercontent.com/VPS-SCRIPT/activevpn-premium/main/PNG/1787542085160.png" crossorigin="anonymous" class="receipt-logo" alt="ACTIVE VPN">
+                    <h2 class="receipt-title">ACTIVE VPN VIP</h2>
+                    <p class="receipt-subtitle">★ OFFICIAL PREMIUM ACCESS ★</p>
+                </div>
+
+                <!-- DETAILS -->
+                <div class="receipt-details">
+                    <div class="receipt-row">
+                        <div class="receipt-label">
+                            <i class="fa-regular fa-user"></i>
+                            <span>အမည်</span>
+                        </div>
+                        <div id="slipName" class="receipt-value">—</div>
+                    </div>
+
+                    <div class="receipt-row">
+                        <div class="receipt-label">
+                            <i class="fa-solid fa-key"></i>
+                            <span>Device ID</span>
+                        </div>
+                        <div id="slipKey" class="receipt-value key">—</div>
+                    </div>
+
+                    <div class="receipt-row">
+                        <div class="receipt-label">
+                            <i class="fa-solid fa-tag"></i>
+                            <span>Price</span>
+                        </div>
+                        <div id="slipPrice" class="receipt-value price-value">—</div>
+                    </div>
+
+                    <div class="receipt-row">
+                        <div class="receipt-label">
+                            <i class="fa-regular fa-calendar-plus"></i>
+                            <span>Start Date</span>
+                        </div>
+                        <div id="slipStart" class="receipt-value">—</div>
+                    </div>
+
+                    <div class="receipt-row">
+                        <div class="receipt-label">
+                            <i class="fa-regular fa-calendar-xmark"></i>
+                            <span>Expired Date</span>
+                        </div>
+                        <div id="slipExp" class="receipt-value">—</div>
+                    </div>
+                </div>
+
+                <!-- PAYMENT SECTION (PERFECTLY ALIGNED) -->
+                <div class="payment-section">
+                    <div class="payment-content">
+                        <!-- QR CODE -->
+                        <img id="paymentQrImage" src="https://raw.githubusercontent.com/VPS-SCRIPT/activevpn-premium/main/PNG/1787215195806.png" crossorigin="anonymous" class="payment-qr" alt="Payment QR">
+
+                        <!-- BANK DETAILS WITH ALIGNED ICONS -->
+                        <div class="bank-details">
+                            <div class="payment-title-row">
+                                <div class="icon-box">
+                                    <i class="fa-solid fa-wallet"></i>
+                                </div>
+                                <span>PAYMENT ( ငွေလွှဲရန် )</span>
+                            </div>
+
+                            <div class="bank-header">
+                                <div class="icon-box">
+                                    <img id="bankLogoImage" src="https://raw.githubusercontent.com/VPS-SCRIPT/activevpn-premium/main/PNG/1787665783272.png" crossorigin="anonymous" referrerpolicy="no-referrer" class="bank-logo" alt="Krungthai Bank">
+                                </div>
+                                <span class="bank-name">KRUNGTHAI BANK</span>
+                            </div>
+
+                            <div class="bank-number">6661912324</div>
+                            <div class="bank-owner">MR JUE HTET KHAING</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FOOTER -->
+                <div class="receipt-footer">
+                    <div class="barcode">
+                        <span></span><span></span><span></span><span></span>
+                        <span></span><span></span><span></span><span></span>
+                        <span></span><span></span><span></span><span></span>
+                        <span></span><span></span><span></span><span></span>
+                    </div>
+                    <p class="thank-you">THANK YOU FOR USING ACTIVE VPN</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ACTION BUTTONS -->
+        <div class="space-y-2 mt-4">
+            <button onclick="downloadSlipImage()" class="w-full bg-gradient-to-r from-emerald-500 to-teal-600 text-slate-950 font-bold py-2.5 rounded-xl flex items-center justify-center gap-2 text-sm">
+                <i class="fa-solid fa-download"></i>
+                <span id="downloadBtnText">ပုံအဖြစ် ဖုန်းထဲသိမ်းမည် (4K)</span>
+            </button>
+
+            <button onclick="copySlipText()" class="w-full bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-white font-medium py-2 rounded-xl flex items-center justify-center gap-2 text-xs">
+                <i class="fa-regular fa-copy"></i> စာသား Copy ကူးယူမည်
+            </button>
+
+            <div class="flex gap-2">
+                <a id="tgShareBtn" target="_blank" class="flex-1 bg-sky-600 text-white font-medium py-2 rounded-xl flex items-center justify-center gap-1.5 text-xs">
+                    <i class="fa-brands fa-telegram"></i> Telegram
+                </a>
+                <a id="waShareBtn" target="_blank" class="flex-1 bg-emerald-600 text-white font-medium py-2 rounded-xl flex items-center justify-center gap-1.5 text-xs">
+                    <i class="fa-brands fa-whatsapp"></i> WhatsApp
+                </a>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+<!-- =========================================================
+     ALERT MODAL
+========================================================= -->
+
+<div id="alertModal" class="hidden fixed inset-0 z-[60] flex items-center justify-center p-4">
+    <div class="absolute inset-0 modal-backdrop"></div>
+    <div class="relative bg-white dark:bg-slate-800 rounded-2xl shadow-2xl w-full max-w-sm p-6 text-center">
+        <div id="alertIconContainer" class="w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-4">
+            <i id="alertIcon" class="fa-solid text-2xl"></i>
+        </div>
+        <h3 id="alertTitle" class="text-lg font-bold mb-2">Title</h3>
+        <p id="alertMessage" class="text-slate-500 dark:text-slate-400 text-xs mb-6">Message</p>
+        <button onclick="closeAlert()" class="w-full bg-blue-600 text-white font-bold py-2.5 rounded-xl">အိုကေ</button>
+    </div>
+</div>
+
+
+<!-- =========================================================
+     CONFIRM MODAL
+========================================================= -->
+
+<div id="confirmModal" class="hidden fixed inset-0 z-[60] flex items-center justify-center p-4">
+    <div class="absolute inset-0 modal-backdrop"></div>
+    <div class="relative bg-white dark:bg-slate-800 rounded-2xl shadow-2xl w-full max-w-sm p-6 text-center">
+        <div class="w-14 h-14 rounded-full bg-red-500/20 text-red-500 flex items-center justify-center mx-auto mb-4">
+            <i class="fa-solid fa-trash-can text-2xl"></i>
+        </div>
+        <h3 id="confirmTitle" class="text-lg font-bold mb-2">ဖျက်ရန် သေချာပါသလား?</h3>
+        <p id="confirmMessage" class="text-slate-500 dark:text-slate-400 text-xs mb-6">ဒီအချက်အလက်ကို ဖျက်လိုက်ပါက ပြန်လည်ရယူ၍ မရနိုင်ပါ။</p>
+        <div class="flex gap-3">
+            <button onclick="closeConfirm()" class="flex-1 bg-slate-200 dark:bg-slate-700 py-2.5 rounded-xl">မလုပ်တော့ပါ</button>
+            <button id="confirmActionBtn" class="flex-1 bg-red-600 text-white font-bold py-2.5 rounded-xl">ဖျက်မည်</button>
+        </div>
+    </div>
+</div>
+
+<textarea id="hiddenCopyText" style="position:absolute;left:-9999px;"></textarea>
+
+
+<!-- =========================================================
+     JAVASCRIPT LOGIC
+========================================================= -->
+
+<script>
+/* =========================================================
+   THEME LOGIC
+========================================================= */
+function initTheme() {
+    const saved = localStorage.getItem("theme");
+    const icon = document.getElementById("themeIcon");
+    if (saved === "light") {
+        document.documentElement.classList.remove("dark");
+        icon.className = "fa-solid fa-sun text-lg text-amber-500";
+    } else {
+        document.documentElement.classList.add("dark");
+        icon.className = "fa-solid fa-moon text-lg text-amber-400";
+    }
+}
+
+function toggleDarkMode() {
+    const html = document.documentElement;
+    const icon = document.getElementById("themeIcon");
+    if (html.classList.contains("dark")) {
+        html.classList.remove("dark");
+        localStorage.setItem("theme", "light");
+        icon.className = "fa-solid fa-sun text-lg text-amber-500";
+    } else {
+        html.classList.add("dark");
+        localStorage.setItem("theme", "dark");
+        icon.className = "fa-solid fa-moon text-lg text-amber-400";
+    }
+}
+initTheme();
+
+/* =========================================================
+   DATE FORMATTING & UTILITIES
+========================================================= */
+function getTodayFormatted() {
+    const d = new Date();
+    return `${String(d.getDate()).padStart(2, "0")}/${String(d.getMonth() + 1).padStart(2, "0")}/${d.getFullYear()}`;
+}
+
+function formatDateForDisplay(value) {
+    if (!value) return "—";
+    if (value.includes("/")) return value;
+    const p = value.split("-");
+    if (p.length !== 3) return value;
+    return `${p[2]}/${p[1]}/${p[0]}`;
+}
+
+function parseFormattedDateToInput(value) {
+    if (!value || value === "—") return "";
+    const p = value.split("/");
+    if (p.length === 3) {
+        return `${p[2]}-${p[1].padStart(2,"0")}-${p[0].padStart(2,"0")}`;
+    }
+    return value;
+}
+
+function getValidDaysAndStatus(value) {
+    if (!value || value === "—") {
+        return { days: "0", isOnline: false };
+    }
+
+    let date;
+    if (value.includes("/")) {
+        const p = value.split("/");
+        date = new Date(p[2], p[1] - 1, p[0], 23, 59, 59);
+    } else {
+        date = new Date(value);
+    }
+
+    if (isNaN(date.getTime())) {
+        return { days: "0", isOnline: false };
+    }
+
+    const now = new Date();
+    const diff = date.getTime() - now.getTime();
+    const days = Math.ceil(diff / 86400000);
+
+    return {
+        days: days > 0 ? String(days) : "0",
+        isOnline: days > 0
+    };
+}
+
+/* စျေးနှုန်းတွင် ฿ သင်္ကေတ အလိုအလျောက် ဖြည့်စွက်ပေးသည့် Function */
+function formatPriceWithSymbol(rawPrice) {
+    if (!rawPrice || rawPrice === "—" || rawPrice === "-") return "—";
+    const str = String(rawPrice).trim();
+    if (str.includes("฿")) return str;
+    return `${str} ฿`;
+}
+
+/* =========================================================
+   ALERT & CONFIRM HANDLERS
+========================================================= */
+function showAlert(title, message, type = "success") {
+    const modal = document.getElementById("alertModal");
+    document.getElementById("alertTitle").innerText = title;
+    document.getElementById("alertMessage").innerText = message;
+    const container = document.getElementById("alertIconContainer");
+    const icon = document.getElementById("alertIcon");
+
+    if (type === "error") {
+        container.className = "w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-4 bg-red-500/20 text-red-500";
+        icon.className = "fa-solid fa-xmark text-2xl";
+    } else {
+        container.className = "w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-4 bg-emerald-500/20 text-emerald-500";
+        icon.className = "fa-solid fa-check text-2xl";
+    }
+    modal.classList.remove("hidden");
+}
+
+function closeAlert() {
+    document.getElementById("alertModal").classList.add("hidden");
+}
+
+let confirmCallback = null;
+function showConfirm(title, message, callback) {
+    confirmCallback = callback;
+    document.getElementById("confirmTitle").innerText = title;
+    document.getElementById("confirmMessage").innerText = message;
+    document.getElementById("confirmModal").classList.remove("hidden");
+}
+
+function closeConfirm() {
+    document.getElementById("confirmModal").classList.add("hidden");
+    confirmCallback = null;
+}
+
+document.getElementById("confirmActionBtn").addEventListener("click", function() {
+    if (confirmCallback) confirmCallback();
+    closeConfirm();
+});
+
+/* =========================================================
+   FIREBASE REALTIME DATABASE CONFIG
+========================================================= */
+const firebaseConfig = {
+    apiKey: "AIzaSyBmvehentAfiAK1pECzIHLTvqNELrVurBY",
+    authDomain: "activevpn-premium.firebaseapp.com",
+    databaseURL: "https://activevpn-premium-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "activevpn-premium",
+    storageBucket: "activevpn-premium.firebasestorage.app",
+    messagingSenderId: "847165419862",
+    appId: "1:847165419862:web:7c74d6d4a4b66f83d066f7"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+let currentDataArray = [];
+let currentTab = "all";
+let currentSlipText = "";
+let currentSlipUserObj = null;
+
+function setDefaultDates() {
+    const d = new Date();
+    const value = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+    const input = document.getElementById("startDate");
+    if (input && !input.value) input.value = value;
+}
+setDefaultDates();
+
+/* =========================================================
+   REALTIME LISTENER
+========================================================= */
+db.ref("premium_users").on("value", function(snapshot) {
+    let data = snapshot.val();
+    if (data && !Array.isArray(data)) {
+        data = Object.values(data);
+    }
+
+    if (data && data.length) {
+        currentDataArray = data.filter(u => u && u["Name"] !== "empty");
+    } else {
+        currentDataArray = [];
+    }
+    renderUsersGrid();
+});
+
+function switchTab(tab) {
+    currentTab = tab;
+    renderUsersGrid();
+}
+
+/* =========================================================
+   RENDER USERS CARDS
+========================================================= */
+function renderUsersGrid() {
+    const grid = document.getElementById("usersGrid");
+    grid.innerHTML = "";
+
+    let online = 0;
+    let offline = 0;
+
+    currentDataArray.forEach(u => {
+        const s = getValidDaysAndStatus(u["Expiration"]);
+        if (s.isOnline) online++;
+        else offline++;
+    });
+
+    document.getElementById("totalUsersCountNav").innerText = `Total: ${currentDataArray.length}`;
+    document.getElementById("countAllBadge").innerText = currentDataArray.length;
+    document.getElementById("countOnlineBadge").innerText = online;
+    document.getElementById("countOfflineBadge").innerText = offline;
+
+    let users = currentDataArray.filter(u => {
+        const s = getValidDaysAndStatus(u["Expiration"]);
+        if (currentTab === "online") return s.isOnline;
+        if (currentTab === "offline") return !s.isOnline;
+        return true;
+    });
+
+    if (!users.length) {
+        grid.innerHTML = `
+        <div class="col-span-full flex flex-col items-center justify-center py-16 text-slate-400">
+            <i class="fa-solid fa-folder-open text-5xl mb-4"></i>
+            <p>အသုံးပြုသူ မရှိသေးပါ</p>
+        </div>`;
+        return;
+    }
+
+    users.forEach(user => {
+        const name = user["Name"] || "-";
+        const key = user["Key"] || "-";
+        const rawPrice = user["Price"] || user["price"] || "-";
+        const priceDisplay = formatPriceWithSymbol(rawPrice);
+        const expire = user["Expiration"] || "-";
+        const status = getValidDaysAndStatus(expire);
+
+        const card = document.createElement("div");
+        card.className = "bg-white dark:bg-slate-800 rounded-2xl p-5 shadow-md border border-slate-200 dark:border-slate-700/80 user-card";
+        card.setAttribute("data-search", `${name} ${key}`.toLowerCase());
+
+        card.innerHTML = `
+        <div class="flex justify-between items-start mb-4">
+            <div>
+                <h3 class="font-bold text-slate-900 dark:text-white">${name}</h3>
+                <span class="text-xs ${status.isOnline ? "text-emerald-500" : "text-red-500"}">
+                    ● ${status.isOnline ? "Online" : "Offline"}
+                </span>
+            </div>
+            <div class="flex gap-1">
+                <button onclick="openEditModal('${key}')" class="p-2 bg-slate-100 dark:bg-slate-900 rounded-lg text-slate-700 dark:text-slate-300">
+                    <i class="fa-solid fa-pen-to-square"></i>
+                </button>
+                <button onclick="openSlipModal('${key}')" class="p-2 bg-slate-100 dark:bg-slate-900 rounded-lg text-blue-500">
+                    <i class="fa-solid fa-ticket"></i>
+                </button>
+                <button onclick="deleteDevice('${key}')" class="p-2 bg-slate-100 dark:bg-slate-900 rounded-lg text-red-500">
+                    <i class="fa-solid fa-trash"></i>
+                </button>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2 bg-slate-50 dark:bg-slate-900 p-3 rounded-xl mb-3 text-xs">
+            <div>
+                <span class="text-slate-400 block">Device ID</span>
+                <div class="font-mono text-xs text-blue-500 break-all font-semibold">${key}</div>
+            </div>
+            <div class="text-right">
+                <span class="text-slate-400 block">Price</span>
+                <div class="font-bold text-emerald-500 dark:text-emerald-400 text-sm">${priceDisplay}</div>
+            </div>
+        </div>
+
+        <div class="flex justify-between text-xs">
+            <div>
+                <span class="text-slate-400 block">Expired Date</span>
+                <b>${expire}</b>
+            </div>
+            <div class="text-right">
+                <span class="${status.isOnline ? "text-emerald-500" : "text-red-500"} font-bold">
+                    ${status.isOnline ? status.days + " Days" : "Expired"}
+                </span>
+            </div>
+        </div>`;
+
+        grid.appendChild(card);
+    });
+}
+
+/* =========================================================
+   SEARCH FILTER
+========================================================= */
+function filterUsers() {
+    const q = document.getElementById("searchInput").value.toLowerCase();
+    document.querySelectorAll(".user-card").forEach(card => {
+        card.style.display = card.getAttribute("data-search").includes(q) ? "block" : "none";
+    });
+}
+
+/* =========================================================
+   ADD USER SUBMIT
+========================================================= */
+document.getElementById("addUserForm").addEventListener("submit", function(e) {
+    e.preventDefault();
+
+    const name = document.getElementById("userName").value.trim();
+    const key = document.getElementById("deviceId").value.trim();
+    const priceInput = document.getElementById("userPrice").value.trim();
+    const formattedPrice = formatPriceWithSymbol(priceInput);
+    const start = document.getElementById("startDate").value;
+    const expire = document.getElementById("expireDate").value;
+
+    const user = {
+        Name: name,
+        Key: key,
+        Price: formattedPrice,
+        StartDate: formatDateForDisplay(start),
+        Expiration: formatDateForDisplay(expire),
+        Valid: getValidDaysAndStatus(expire).days
+    };
+
+    const index = currentDataArray.findIndex(u => u && u["Key"] === key);
+    if (index >= 0) currentDataArray[index] = user;
+    else currentDataArray.push(user);
+
+    db.ref("premium_users").set(currentDataArray)
+        .then(() => {
+            showAlert("အောင်မြင်ပါသည်", `${name} ကို Premium စာရင်းသို့ ထည့်ပြီးပါပြီ။`);
+            document.getElementById("addUserForm").reset();
+            setDefaultDates();
+        })
+        .catch(err => {
+            showAlert("အမှား", err.message, "error");
+        });
+});
+
+/* =========================================================
+   EDIT USER MODAL LOGIC
+========================================================= */
+function openEditModal(key) {
+    const user = currentDataArray.find(u => u && u["Key"] === key);
+    if (!user) return;
+
+    document.getElementById("editOriginalKey").value = key;
+    document.getElementById("editUserName").value = user["Name"] || "";
+    document.getElementById("editDeviceId").value = user["Key"] || "";
+    document.getElementById("editPrice").value = user["Price"] || user["price"] || "";
+    document.getElementById("editStartDate").value = parseFormattedDateToInput(user["StartDate"] || getTodayFormatted());
+    document.getElementById("editExpireDate").value = parseFormattedDateToInput(user["Expiration"]);
+
+    document.getElementById("editModal").classList.remove("hidden");
+}
+
+function closeEditModal() {
+    document.getElementById("editModal").classList.add("hidden");
+}
+
+document.getElementById("editUserForm").addEventListener("submit", function(e) {
+    e.preventDefault();
+    const original = document.getElementById("editOriginalKey").value;
+
+    const priceInput = document.getElementById("editPrice").value.trim();
+
+    const user = {
+        Name: document.getElementById("editUserName").value.trim(),
+        Key: document.getElementById("editDeviceId").value.trim(),
+        Price: formatPriceWithSymbol(priceInput),
+        StartDate: formatDateForDisplay(document.getElementById("editStartDate").value),
+        Expiration: formatDateForDisplay(document.getElementById("editExpireDate").value)
+    };
+
+    user.Valid = getValidDaysAndStatus(user.Expiration).days;
+
+    const index = currentDataArray.findIndex(u => u && u["Key"] === original);
+    if (index >= 0) {
+        currentDataArray[index] = user;
+        db.ref("premium_users").set(currentDataArray).then(() => {
+            closeEditModal();
+            showAlert("ပြင်ဆင်ပြီးပါပြီ", "အကောင့်အချက်အလက်များကို သိမ်းဆည်းပြီးပါပြီ။");
+        });
+    }
+});
+
+/* =========================================================
+   RECEIPT SLIP MODAL DISPLAY
+========================================================= */
+function openSlipModal(key) {
+    const user = currentDataArray.find(u => u && u["Key"] === key);
+    if (!user) return;
+
+    currentSlipUserObj = user;
+
+    const name = user["Name"] || "—";
+    const device = user["Key"] || "—";
+    const rawPrice = user["Price"] || user["price"] || "—";
+    const priceDisplay = formatPriceWithSymbol(rawPrice);
+    const start = (user["StartDate"] && user["StartDate"] !== "—") ? user["StartDate"] : (user["startDate"] || getTodayFormatted());
+    const expire = user["Expiration"] || user["expireDate"] || "—";
+
+    document.getElementById("slipName").innerText = name;
+    document.getElementById("slipKey").innerText = device;
+    document.getElementById("slipPrice").innerText = priceDisplay;
+    document.getElementById("slipStart").innerText = start;
+    document.getElementById("slipExp").innerText = expire;
+
+    currentSlipText = `ACTIVE VPN VIP
+
+အမည် : ${name}
+Device ID : ${device}
+Price : ${priceDisplay}
+Start Date : ${start}
+Expired Date : ${expire}
+
+PAYMENT
+KRUNGTHAI BANK
+6661912324
+MR JUE HTET KHAING
+
+THANK YOU FOR USING ACTIVE VPN`;
+
+    const encoded = encodeURIComponent(currentSlipText);
+    document.getElementById("tgShareBtn").href = `https://t.me/share/url?url=&text=${encoded}`;
+    document.getElementById("waShareBtn").href = `https://api.whatsapp.com/send?text=${encoded}`;
+
+    document.getElementById("slipModal").classList.remove("hidden");
+    preloadReceiptImages();
+}
+
+function closeSlipModal() {
+    document.getElementById("slipModal").classList.add("hidden");
+}
+
+/* =========================================================
+   RECEIPT IMAGE CAPTURE & DOWNLOAD
+========================================================= */
+function waitForImage(img) {
+    return new Promise(resolve => {
+        if (!img) { resolve(); return; }
+        if (img.complete) { resolve(); return; }
+        img.onload = () => resolve();
+        img.onerror = () => resolve();
+    });
+}
+
+async function preloadReceiptImages() {
+    await Promise.all([
+        waitForImage(document.getElementById("bankLogoImage")),
+        waitForImage(document.getElementById("paymentQrImage")),
+        waitForImage(document.querySelector("#receiptCardToCapture .receipt-logo"))
+    ]);
+}
+
+async function downloadSlipImage() {
+    const card = document.getElementById("receiptCardToCapture");
+    const btn = document.getElementById("downloadBtnText");
+    btn.innerText = "ပုံထုတ်နေသည်...";
+
+    try {
+        await preloadReceiptImages();
+        await new Promise(r => setTimeout(r, 350));
+
+        const canvas = await html2canvas(card, {
+            scale: 4,
+            useCORS: true,
+            allowTaint: false,
+            backgroundColor: "#020617",
+            logging: false,
+            imageTimeout: 15000,
+            scrollX: 0,
+            scrollY: 0,
+            width: card.scrollWidth,
+            height: card.scrollHeight,
+            windowWidth: card.scrollWidth,
+            windowHeight: card.scrollHeight
+        });
+
+        const link = document.createElement("a");
+        const name = currentSlipUserObj ? (currentSlipUserObj["Name"] || "User") : "User";
+        link.download = `ACTIVE_VPN_${name}_Receipt.png`;
+        link.href = canvas.toDataURL("image/png");
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        btn.innerText = "ပုံအဖြစ် ဖုန်းထဲသိမ်းမည် (4K)";
+        showAlert("အောင်မြင်ပါသည်", "Receipt ပုံကို 4K PNG အဖြစ် သိမ်းပြီးပါပြီ။");
+    } catch(error) {
+        console.error(error);
+        btn.innerText = "ပုံအဖြစ် ဖုန်းထဲသိမ်းမည် (4K)";
+        showAlert("အမှားဖြစ်နေပါသည်", "Receipt ပုံထုတ်ရာတွင် အမှားဖြစ်နေပါသည်။", "error");
+    }
+}
+
+/* =========================================================
+   TEXT COPY & DELETE
+========================================================= */
+function copySlipText() {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(currentSlipText).then(() => {
+            showAlert("Copy ကူးပြီးပါပြီ", "Receipt စာသားကို Copy ကူးပြီးပါပြီ။");
+        });
+    } else {
+        const ta = document.getElementById("hiddenCopyText");
+        ta.value = currentSlipText;
+        ta.select();
+        document.execCommand("copy");
+        showAlert("Copy ကူးပြီးပါပြီ", "Receipt စာသားကို Copy ကူးပြီးပါပြီ။");
+    }
+}
+
+function deleteDevice(key) {
+    showConfirm("ဖျက်ရန် သေချာပါသလား?", `Device ID: ${key} ကို ဖျက်မည်မှာ သေချာပါသလား?`, function() {
+        const index = currentDataArray.findIndex(u => u && u["Key"] === key);
+        if (index < 0) return;
+
+        currentDataArray.splice(index, 1);
+        db.ref("premium_users").set(currentDataArray).then(() => {
+            showAlert("ဖျက်ပြီးပါပြီ", "User ကို စာရင်းမှ ဖယ်ရှားပြီးပါပြီ။");
+        });
+    });
+}
+
+/* =========================================================
+   SERVICE WORKER
+========================================================= */
+if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("sw.js")
+        .then(() => console.log("✅ SW registered"))
+        .catch(err => console.warn("SW registration failed:", err));
+}
+</script>
+
+</body>
+</html>
