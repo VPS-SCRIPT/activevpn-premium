@@ -1,0 +1,1639 @@
+<!DOCTYPE html>
+<html lang="my" class="dark">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0"
+>
+
+<title>ACTIVE VPN Admin Panel Pro</title>
+
+<meta name="theme-color" content="#020617">
+
+<script src="https://cdn.tailwindcss.com"></script>
+
+<script>
+tailwind.config = {
+    darkMode: 'class'
+};
+</script>
+
+<link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+>
+
+<!-- html-to-image library -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html-to-image/1.11.11/html-to-image.min.js"></script>
+
+<script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
+
+<script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-database-compat.js"></script>
+
+
+<style>
+
+/* =========================================================
+   GLOBAL STYLES
+========================================================= */
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    min-height: 100vh;
+}
+
+
+/* =========================================================
+   CUSTOM SCROLLBAR
+========================================================= */
+
+::-webkit-scrollbar {
+    width: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #475569;
+    border-radius: 8px;
+}
+
+
+/* =========================================================
+   TICKET NOTCH (လက်မှတ်အစွန်းဝိုင်းပုံစံ)
+========================================================= */
+
+.ticket-notch {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 27px;
+    height: 27px;
+    border-radius: 50%;
+    background: #020617;
+    border: 2px solid rgba(59,130,246,0.42);
+    z-index: 30;
+}
+
+.ticket-notch-left {
+    left: -14px;
+}
+
+.ticket-notch-right {
+    right: -14px;
+}
+
+
+/* =========================================================
+   RECEIPT CARD CONTAINER (PERFECT ALIGNMENT OPTIMIZED)
+========================================================= */
+
+#receiptCardToCapture {
+    width: 100%;
+    max-width: 420px;
+    margin: 0 auto;
+    padding: 0;
+    background: #020617 !important;
+    border-radius: 24px;
+    position: relative;
+    overflow: visible !important;
+    border: 2px solid rgba(59,130,246,0.40);
+    box-shadow: none !important;
+    outline: none !important;
+}
+
+
+/* =========================================================
+   RECEIPT INNER CONTENT
+========================================================= */
+
+.receipt-inner {
+    padding: 22px;
+    background: #020617 !important;
+    border-radius: 22px;
+    overflow: visible;
+}
+
+
+/* =========================================================
+   HEADER SECTION
+========================================================= */
+
+.receipt-header {
+    text-align: center;
+    padding-bottom: 17px;
+    border-bottom: 1px solid rgba(59,130,246,0.25);
+}
+
+.receipt-logo {
+    width: 64px;
+    height: 64px;
+    object-fit: contain;
+    display: block;
+    margin: 0 auto 9px auto;
+    border-radius: 50%;
+}
+
+.receipt-title {
+    margin: 0;
+    color: #fbbf24;
+    font-size: 23px;
+    line-height: 1.25;
+    font-weight: 900;
+    letter-spacing: 0.035em;
+}
+
+.receipt-subtitle {
+    margin: 7px 0 0 0;
+    color: #34d399;
+    font-size: 10px;
+    line-height: 1.2;
+    font-family: monospace;
+    letter-spacing: 0.19em;
+}
+
+
+/* =========================================================
+   USER DETAILS ROWS (PIXEL-PERFECT ALIGNMENT)
+========================================================= */
+
+.receipt-details {
+    margin-top: 14px;
+    border-bottom: 1px solid rgba(30,41,59,0.8);
+}
+
+.receipt-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    min-height: 48px;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(30,41,59,0.78);
+    gap: 12px;
+}
+
+.receipt-row:last-child {
+    border-bottom: none;
+}
+
+
+/* =========================================================
+   LABEL & SVG ICON
+========================================================= */
+
+.receipt-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #94a3b8;
+    font-size: 12px;
+    font-weight: 800;
+    text-transform: uppercase;
+    white-space: nowrap;
+    flex-shrink: 0;
+    line-height: 1;
+}
+
+.receipt-svg-icon {
+    width: 22px;
+    height: 22px;
+    flex: 0 0 22px;
+    color: #60a5fa;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+
+/* =========================================================
+   VALUE TEXT
+========================================================= */
+
+.receipt-value {
+    flex: 1;
+    min-width: 0;
+    text-align: right;
+    color: #f8fafc;
+    font-size: 14px;
+    line-height: 1.35;
+    font-weight: 800;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
+.receipt-value.key {
+    color: #fcd34d;
+    font-family: "Courier New", monospace;
+    font-size: 13px;
+    letter-spacing: 0.035em;
+}
+
+.receipt-value.price-value {
+    color: #34d399 !important;
+    font-weight: 900;
+    font-size: 14px;
+}
+
+
+/* =========================================================
+   PAYMENT SECTION
+========================================================= */
+
+.payment-section {
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 1px dashed rgba(59,130,246,0.35);
+}
+
+.payment-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    gap: 16px;
+    padding: 0 4px;
+}
+
+.payment-qr {
+    width: 85px !important;
+    height: 85px !important;
+    min-width: 85px !important;
+    min-height: 85px !important;
+    object-fit: contain;
+    display: block;
+    flex: 0 0 85px;
+    padding: 3px;
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 10px;
+}
+
+.bank-details {
+    min-width: 0;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+.icon-box {
+    width: 28px;
+    height: 28px;
+    min-width: 28px;
+    min-height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 28px;
+}
+
+.payment-title-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #fbbf24;
+    font-size: 14px;
+    font-weight: 900;
+    line-height: 1;
+    margin-bottom: 6px;
+}
+
+.bank-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    margin-bottom: 2px;
+}
+
+.bank-logo {
+    width: 28px !important;
+    height: 28px !important;
+    min-width: 28px !important;
+    min-height: 28px !important;
+    object-fit: contain;
+    display: block;
+    border-radius: 50%;
+}
+
+.bank-name {
+    display: flex;
+    align-items: center;
+    color: #94a3b8;
+    font-size: 11px;
+    line-height: 1;
+    font-weight: 900;
+    letter-spacing: 0.03em;
+    white-space: nowrap;
+    margin: 0;
+}
+
+.bank-number {
+    color: #fcd34d;
+    font-family: "Courier New", monospace;
+    font-size: 16px;
+    line-height: 1.2;
+    font-weight: 900;
+    letter-spacing: 0.06em;
+    white-space: nowrap;
+    padding-left: 36px;
+    margin-top: 2px;
+    margin-bottom: 5px;
+}
+
+.bank-owner {
+    color: #ffffff;
+    font-size: 11px;
+    line-height: 1.2;
+    font-weight: 800;
+    white-space: nowrap;
+    letter-spacing: 0.02em;
+    padding-left: 36px;
+    margin-top: 0px;
+}
+
+
+/* =========================================================
+   FOOTER & SLIP NOTICE
+========================================================= */
+
+.receipt-footer {
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 1px dashed rgba(59,130,246,0.35);
+    text-align: center;
+    background: transparent !important;
+}
+
+.slip-notice-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background: rgba(245, 158, 11, 0.12);
+    border: 1.5px solid rgba(245, 158, 11, 0.45);
+    border-radius: 12px;
+    color: #fbbf24;
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    margin-bottom: 10px;
+    box-shadow: 0 0 15px rgba(245, 158, 11, 0.1);
+}
+
+.thank-you {
+    margin: 0;
+    color: #94a3b8;
+    font-size: 9px;
+    line-height: 1.2;
+    font-family: monospace;
+    letter-spacing: 0.15em;
+}
+
+
+/* =========================================================
+   ANIMATED RADAR & LIVE BADGES
+========================================================= */
+
+@keyframes radarPulse {
+    0% { transform: scale(0.95); opacity: 0.8; }
+    50% { transform: scale(1.35); opacity: 0; }
+    100% { transform: scale(0.95); opacity: 0; }
+}
+
+.pulse-radar {
+    animation: radarPulse 1.8s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+
+/* =========================================================
+   MODALS & SPINNER
+========================================================= */
+
+.modal-backdrop {
+    background: rgba(15,23,42,0.78);
+    backdrop-filter: blur(8px);
+}
+
+.spinner {
+    border: 3px solid rgba(59,130,246,0.15);
+    border-top-color: #3b82f6;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    animation: spin .7s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+
+/* =========================================================
+   MOBILE RESPONSIVE
+========================================================= */
+
+@media(max-width:480px) {
+    #receiptCardToCapture {
+        max-width: 100%;
+        border-radius: 22px;
+    }
+
+    .receipt-inner {
+        padding: 18px;
+        border-radius: 20px;
+    }
+
+    .receipt-row {
+        min-height: 44px;
+    }
+
+    .receipt-label {
+        font-size: 11px;
+    }
+
+    .receipt-value {
+        font-size: 13px;
+    }
+
+    .payment-qr {
+        width: 78px !important;
+        height: 78px !important;
+        flex: 0 0 78px;
+    }
+
+    .bank-number {
+        font-size: 14px;
+        padding-left: 34px;
+        margin-bottom: 4px;
+    }
+
+    .bank-owner {
+        font-size: 10px;
+        padding-left: 34px;
+    }
+
+    .slip-notice-badge {
+        font-size: 11.5px;
+        padding: 7px 12px;
+    }
+}
+</style>
+
+</head>
+
+
+<body class="bg-slate-100 dark:bg-slate-900 min-h-screen font-sans text-slate-800 dark:text-slate-100">
+
+
+<!-- =========================================================
+     NAVBAR
+========================================================= -->
+
+<nav class="bg-white/90 dark:bg-slate-800/90 backdrop-blur-md shadow-md border-b border-slate-200 dark:border-slate-700/60 sticky top-0 z-30">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between h-16 items-center">
+            <div class="flex items-center gap-3">
+                <img src="https://raw.githubusercontent.com/VPS-SCRIPT/activevpn-premium/main/PNG/1787574190521.png" class="w-10 h-10 object-contain rounded-xl" alt="Logo">
+                <div>
+                    <span class="font-extrabold text-xl text-slate-900 dark:text-white tracking-wide block leading-none">ACTIVE VPN</span>
+                    <span class="text-xs text-blue-600 dark:text-blue-400 font-semibold">Admin Management Panel</span>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-3">
+                <span id="dbStatusBadge" class="hidden sm:inline-flex items-center gap-1.5 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 text-[11px] font-bold py-1 px-2.5 rounded-full">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500"></span> DB Live
+                </span>
+                <span id="totalUsersCountNav" class="bg-blue-50 dark:bg-slate-700 text-blue-700 dark:text-blue-300 font-bold text-xs py-1.5 px-3.5 rounded-full border border-blue-200 dark:border-slate-600">Total: 0</span>
+                <button onclick="toggleDarkMode()" class="p-2.5 rounded-xl bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-amber-400 border border-slate-300 dark:border-slate-600">
+                    <i id="themeIcon" class="fa-solid fa-moon text-lg"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</nav>
+
+
+<!-- =========================================================
+     FIREBASE PERMISSION WARNING BANNER (ပြဿနာရှိပါက အလိုအလျောက် ပေါ်မည်)
+========================================================= -->
+
+<div id="firebaseErrorBanner" class="hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
+    <div class="bg-red-500/10 border border-red-500/30 rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-red-600 dark:text-red-400">
+        <div class="flex items-center gap-3">
+            <i class="fa-solid fa-triangle-exclamation text-2xl"></i>
+            <div>
+                <h4 class="font-bold text-sm">Firebase Database Rules သက်တမ်းကုန်နေပါသည် (Permission Denied)</h4>
+                <p class="text-xs text-slate-600 dark:text-slate-300 mt-0.5">Firebase Console > Realtime Database > Rules သို့သွား၍ <code>".read": true, ".write": true</code> ဟု ပြင်ဆင်ပေးရန် လိုအပ်ပါသည်။</p>
+            </div>
+        </div>
+        <button onclick="dismissErrorBanner()" class="text-xs font-bold bg-red-600 text-white px-3 py-1.5 rounded-xl hover:bg-red-700 transition">နားလည်ပါပြီ</button>
+    </div>
+</div>
+
+
+<!-- =========================================================
+     MAIN CONTENT AREA
+========================================================= -->
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="flex flex-col lg:flex-row gap-8">
+
+        <!-- ADD USER FORM -->
+        <div class="w-full lg:w-1/3">
+            <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700/60 p-6 sticky top-24">
+                <div class="mb-6 border-b border-slate-100 dark:border-slate-700 pb-4">
+                    <h2 class="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                        <i class="fa-solid fa-user-plus text-blue-600 dark:text-blue-400"></i> အကောင့်အသစ်ထည့်ရန်
+                    </h2>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">ACTIVE VPN Premium အသုံးပြုခွင့်ပေးမည့် အချက်အလက်များဖြည့်ပါ။</p>
+                </div>
+
+                <form id="addUserForm" class="space-y-4">
+                    <!-- USER NAME -->
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1 flex items-center gap-1.5">
+                            <i class="fa-solid fa-circle-user text-blue-500 text-xs"></i>
+                            <span>အမည် (User Name)</span>
+                        </label>
+                        <div class="relative">
+                            <i class="fa-solid fa-user absolute left-3.5 top-3.5 text-slate-400 text-xs"></i>
+                            <input type="text" id="userName" placeholder="ဥပမာ - User 1" required class="w-full pl-9 pr-3 rounded-xl bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white py-2.5 text-sm outline-none border border-slate-300 dark:border-slate-700 focus:border-blue-500">
+                        </div>
+                    </div>
+
+                    <!-- DEVICE ID -->
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1 flex items-center gap-1.5">
+                            <i class="fa-solid fa-key text-amber-500 text-xs"></i>
+                            <span>Device ID (Key)</span>
+                        </label>
+                        <div class="relative">
+                            <i class="fa-solid fa-fingerprint absolute left-3.5 top-3.5 text-slate-400 text-xs"></i>
+                            <input type="text" id="deviceId" placeholder="dfc56c9781edf3e4" required class="w-full pl-9 pr-3 rounded-xl bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white py-2.5 text-sm outline-none border border-slate-300 dark:border-slate-700 font-mono focus:border-blue-500">
+                        </div>
+                    </div>
+
+                    <!-- PRICE -->
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1 flex items-center gap-1.5">
+                            <i class="fa-solid fa-tag text-emerald-500 text-xs"></i>
+                            <span>စျေးနှုန်း (Price)</span>
+                        </label>
+                        <div class="relative">
+                            <i class="fa-solid fa-baht-sign absolute left-3.5 top-3.5 text-slate-400 text-xs"></i>
+                            <input type="text" id="userPrice" placeholder="ဥပမာ - 100" required class="w-full pl-9 pr-3 rounded-xl bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white py-2.5 text-sm outline-none border border-slate-300 dark:border-slate-700 focus:border-blue-500">
+                        </div>
+                    </div>
+
+                    <!-- DATE PICKER MODAL POP-UP SELECTOR -->
+                    <div class="bg-blue-50/50 dark:bg-slate-900/60 p-3.5 rounded-2xl border border-blue-100 dark:border-slate-700/80 space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
+                                <i class="fa-regular fa-calendar-days text-blue-500"></i> သက်တမ်းကာလ သတ်မှတ်ခြင်း
+                            </span>
+                            <button type="button" onclick="openDateModal('add')" class="text-[11px] font-bold text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900/40 hover:bg-blue-200 dark:hover:bg-blue-800/60 px-2.5 py-1 rounded-lg transition flex items-center gap-1">
+                                <i class="fa-solid fa-wand-magic-sparkles"></i> Pop-up ရွေးရန်
+                            </button>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 mb-1 flex items-center gap-1">
+                                    <i class="fa-regular fa-calendar-plus text-emerald-500"></i> Start Date
+                                </label>
+                                <input type="date" id="startDate" required class="w-full rounded-xl bg-white dark:bg-slate-800 text-slate-900 dark:text-white py-2 px-2.5 text-xs outline-none border border-slate-200 dark:border-slate-700 font-sans">
+                            </div>
+
+                            <div>
+                                <label class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 mb-1 flex items-center gap-1">
+                                    <i class="fa-regular fa-calendar-xmark text-red-500"></i> Expire Date
+                                </label>
+                                <input type="date" id="expireDate" required class="w-full rounded-xl bg-white dark:bg-slate-800 text-slate-900 dark:text-white py-2 px-2.5 text-xs outline-none border border-slate-200 dark:border-slate-700 font-sans">
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" id="addUserSubmitBtn" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold py-3 px-4 rounded-xl shadow-lg flex items-center justify-center gap-2 transition duration-200">
+                        <i class="fa-solid fa-bolt"></i>
+                        <span id="submitBtnText">Premium ပေးမည်</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- USER LIST SECTION -->
+        <div class="w-full lg:w-2/3">
+            <div class="mb-6 space-y-4">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <h2 class="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                        <i class="fa-solid fa-users text-blue-600 dark:text-blue-400"></i> Premium အသုံးပြုသူများ
+                    </h2>
+
+                    <div class="relative w-full sm:w-64">
+                        <input type="text" id="searchInput" onkeyup="filterUsers()" placeholder="ရှာဖွေရန်..." class="w-full pl-9 pr-4 py-2 text-sm bg-white dark:bg-slate-800 text-slate-900 dark:text-white rounded-xl border border-slate-300 dark:border-slate-700">
+                        <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-slate-400 text-xs"></i>
+                    </div>
+                </div>
+
+                <!-- 4 TABS: ALL / ONLINE (GREEN) / EXPIRING (YELLOW) / OFFLINE (RED) -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 bg-slate-200 dark:bg-slate-800 p-1.5 rounded-2xl border border-slate-300 dark:border-slate-700 gap-1.5">
+                    <button onclick="switchTab('all')" id="tabAll" class="py-2 px-2.5 rounded-xl text-xs font-bold bg-white dark:bg-slate-700 text-blue-600 dark:text-blue-400 shadow">
+                        အားလုံး <span id="countAllBadge" class="ml-1 opacity-80">0</span>
+                    </button>
+                    <button onclick="switchTab('online')" id="tabOnline" class="py-2 px-2.5 rounded-xl text-xs font-bold text-emerald-600 dark:text-emerald-400">
+                        ● Online <span id="countOnlineBadge" class="ml-1 opacity-80">0</span>
+                    </button>
+                    <button onclick="switchTab('warning')" id="tabWarning" class="py-2 px-2.5 rounded-xl text-xs font-bold text-amber-600 dark:text-amber-400">
+                        ● နီးကပ် <span id="countWarningBadge" class="ml-1 opacity-80">0</span>
+                    </button>
+                    <button onclick="switchTab('offline')" id="tabOffline" class="py-2 px-2.5 rounded-xl text-xs font-bold text-red-600 dark:text-red-400">
+                        ● Offline <span id="countOfflineBadge" class="ml-1 opacity-80">0</span>
+                    </button>
+                </div>
+            </div>
+
+            <div id="usersGrid" class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div class="col-span-full flex flex-col items-center justify-center py-16 text-slate-400">
+                    <div class="spinner mb-3"></div>
+                    <p class="text-sm">Data များကို ရယူနေပါသည်...</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+<!-- =========================================================
+     DATE PICKER & PRESET MODAL POP-UP
+========================================================= -->
+
+<div id="datePickerModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div class="absolute inset-0 modal-backdrop" onclick="closeDateModal()"></div>
+    <div class="relative bg-white dark:bg-slate-800 rounded-2xl shadow-2xl w-full max-w-sm p-6 border border-slate-200 dark:border-slate-700">
+        
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-base font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
+                <i class="fa-solid fa-calendar-check text-blue-600 dark:text-blue-400"></i> သက်တမ်းကာလ ရွေးချယ်ရန်
+            </h3>
+            <button onclick="closeDateModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-white">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+        </div>
+
+        <p class="text-xs text-slate-500 dark:text-slate-400 mb-4">အမြန်ရွေးချယ်ရန် သတ်မှတ်ထားသော ကာလခလုတ်များကို နှိပ်ပါ-</p>
+
+        <!-- PRESET DURATION BUTTONS -->
+        <div class="grid grid-cols-2 gap-2.5 mb-5">
+            <button type="button" onclick="applyDatePreset(30)" class="p-2.5 rounded-xl bg-blue-50 dark:bg-slate-700/60 hover:bg-blue-100 dark:hover:bg-slate-700 border border-blue-200 dark:border-slate-600 text-left transition">
+                <div class="text-xs font-bold text-blue-700 dark:text-blue-300">၁ လ (30 Days)</div>
+                <div class="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">1 Month Pass</div>
+            </button>
+
+            <button type="button" onclick="applyDatePreset(60)" class="p-2.5 rounded-xl bg-blue-50 dark:bg-slate-700/60 hover:bg-blue-100 dark:hover:bg-slate-700 border border-blue-200 dark:border-slate-600 text-left transition">
+                <div class="text-xs font-bold text-blue-700 dark:text-blue-300">၂ လ (60 Days)</div>
+                <div class="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">2 Months Pass</div>
+            </button>
+
+            <button type="button" onclick="applyDatePreset(90)" class="p-2.5 rounded-xl bg-purple-50 dark:bg-purple-950/40 hover:bg-purple-100 dark:hover:bg-purple-900/60 border border-purple-200 dark:border-purple-800 text-left transition">
+                <div class="text-xs font-bold text-purple-700 dark:text-purple-300">၃ လ (90 Days)</div>
+                <div class="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">Quarterly Pass</div>
+            </button>
+
+            <button type="button" onclick="applyDatePreset(180)" class="p-2.5 rounded-xl bg-purple-50 dark:bg-purple-950/40 hover:bg-purple-100 dark:hover:bg-purple-900/60 border border-purple-200 dark:border-purple-800 text-left transition">
+                <div class="text-xs font-bold text-purple-700 dark:text-purple-300">၆ လ (180 Days)</div>
+                <div class="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">Half-Year Pass</div>
+            </button>
+
+            <button type="button" onclick="applyDatePreset(365)" class="col-span-2 p-2.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 border border-emerald-200 dark:border-emerald-800 text-center transition">
+                <div class="text-xs font-extrabold text-emerald-700 dark:text-emerald-300">★ ၁ နှစ် (365 Days / 1 Year) ★</div>
+                <div class="text-[10px] text-emerald-600 dark:text-emerald-400 mt-0.5">VIP Yearly Pass</div>
+            </button>
+        </div>
+
+        <button type="button" onclick="closeDateModal()" class="w-full bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-white font-semibold py-2.5 rounded-xl text-xs">
+            ပိတ်မည်
+        </button>
+    </div>
+</div>
+
+
+<!-- =========================================================
+     EDIT USER MODAL
+========================================================= -->
+
+<div id="editModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div class="absolute inset-0 modal-backdrop" onclick="closeEditModal()"></div>
+    <div class="relative bg-white dark:bg-slate-800 rounded-2xl shadow-2xl w-full max-w-md p-6">
+        <h3 class="text-lg font-bold mb-5 flex items-center gap-2">
+            <i class="fa-solid fa-pen-to-square text-blue-600"></i> အကောင့်ပြင်ဆင်ရန်
+        </h3>
+
+        <form id="editUserForm" class="space-y-4">
+            <input type="hidden" id="editOriginalKey">
+            
+            <div>
+                <label class="block text-xs font-semibold mb-1 text-slate-700 dark:text-slate-300">အမည်</label>
+                <input type="text" id="editUserName" placeholder="Name" required class="w-full rounded-xl bg-slate-50 dark:bg-slate-900 py-2.5 px-3 text-sm border">
+            </div>
+
+            <div>
+                <label class="block text-xs font-semibold mb-1 text-slate-700 dark:text-slate-300">Device ID</label>
+                <input type="text" id="editDeviceId" placeholder="Device ID" required class="w-full rounded-xl bg-slate-50 dark:bg-slate-900 py-2.5 px-3 text-sm border font-mono">
+            </div>
+
+            <div>
+                <label class="block text-xs font-semibold mb-1 text-slate-700 dark:text-slate-300">စျေးနှုန်း</label>
+                <input type="text" id="editPrice" placeholder="Price (ဥပမာ - 100)" required class="w-full rounded-xl bg-slate-50 dark:bg-slate-900 py-2.5 px-3 text-sm border">
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+                <div>
+                    <label class="block text-xs font-semibold mb-1 text-slate-700 dark:text-slate-300">Start Date</label>
+                    <input type="date" id="editStartDate" required class="w-full rounded-xl bg-slate-50 dark:bg-slate-900 py-2 px-3 text-xs border">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold mb-1 text-slate-700 dark:text-slate-300">Expire Date</label>
+                    <input type="date" id="editExpireDate" required class="w-full rounded-xl bg-slate-50 dark:bg-slate-900 py-2 px-3 text-xs border">
+                </div>
+            </div>
+
+            <div class="flex gap-3 pt-2">
+                <button type="button" onclick="closeEditModal()" class="flex-1 bg-slate-200 dark:bg-slate-700 py-2.5 rounded-xl text-sm font-semibold">မလုပ်တော့ပါ</button>
+                <button type="submit" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-xl text-sm">သိမ်းမည်</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<!-- =========================================================
+     RECEIPT SLIP MODAL
+========================================================= -->
+
+<div id="slipModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto">
+    <div class="absolute inset-0 modal-backdrop" onclick="closeSlipModal()"></div>
+    <div class="relative w-full max-w-md my-auto bg-transparent shadow-none border-none">
+        
+        <div class="flex justify-between items-center mb-3 px-1">
+            <h3 class="text-sm font-bold text-white">
+                <i class="fa-solid fa-ticket"></i> ACTIVE VPN Receipt
+            </h3>
+            <button onclick="closeSlipModal()" class="text-white/70 hover:text-white">
+                <i class="fa-solid fa-xmark text-xl"></i>
+            </button>
+        </div>
+
+        <!-- RECEIPT CARD TO CAPTURE -->
+        <div id="receiptCardToCapture">
+            <div class="ticket-notch ticket-notch-left"></div>
+            <div class="ticket-notch ticket-notch-right"></div>
+
+            <div class="receipt-inner">
+                <!-- HEADER -->
+                <div class="receipt-header">
+                    <img src="https://raw.githubusercontent.com/VPS-SCRIPT/activevpn-premium/main/PNG/1787574190521.png" crossorigin="anonymous" class="receipt-logo" alt="ACTIVE VPN">
+                    <h2 class="receipt-title">ACTIVE VPN VIP</h2>
+                    <p class="receipt-subtitle">★ OFFICIAL PREMIUM ACCESS ★</p>
+                </div>
+
+                <!-- DETAILS WITH CRISP EMBEDDED SVGS -->
+                <div class="receipt-details">
+                    <!-- NAME ROW -->
+                    <div class="receipt-row">
+                        <div class="receipt-label">
+                            <span class="receipt-svg-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                            </span>
+                            <span>အမည်</span>
+                        </div>
+                        <div id="slipName" class="receipt-value">—</div>
+                    </div>
+
+                    <!-- DEVICE ID ROW -->
+                    <div class="receipt-row">
+                        <div class="receipt-label">
+                            <span class="receipt-svg-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="7.5" cy="15.5" r="5.5"/><path d="m21 2-9.6 9.6"/><path d="m15.5 7.5 3 3L22 7l-3-3"/></svg>
+                            </span>
+                            <span>DEVICE ID</span>
+                        </div>
+                        <div id="slipKey" class="receipt-value key">—</div>
+                    </div>
+
+                    <!-- PRICE ROW -->
+                    <div class="receipt-row">
+                        <div class="receipt-label">
+                            <span class="receipt-svg-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2H2v10l9.29 9.29c.94.94 2.48.94 3.42 0l6.58-6.58c.94-.94.94-2.48 0-3.42L12 2Z"/><circle cx="7" cy="7" r=".5" fill="currentColor"/></svg>
+                            </span>
+                            <span>PRICE</span>
+                        </div>
+                        <div id="slipPrice" class="receipt-value price-value">—</div>
+                    </div>
+
+                    <!-- START DATE ROW -->
+                    <div class="receipt-row">
+                        <div class="receipt-label">
+                            <span class="receipt-svg-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/><path d="M10 16h4"/><path d="M12 14v4"/></svg>
+                            </span>
+                            <span>START DATE</span>
+                        </div>
+                        <div id="slipStart" class="receipt-value">—</div>
+                    </div>
+
+                    <!-- EXPIRED DATE ROW -->
+                    <div class="receipt-row">
+                        <div class="receipt-label">
+                            <span class="receipt-svg-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/><path d="m10 14 4 4"/><path d="m14 14-4 4"/></svg>
+                            </span>
+                            <span>EXPIRED DATE</span>
+                        </div>
+                        <div id="slipExp" class="receipt-value">—</div>
+                    </div>
+                </div>
+
+                <!-- PAYMENT SECTION -->
+                <div class="payment-section">
+                    <div class="payment-content">
+                        <!-- QR CODE -->
+                        <img id="paymentQrImage" src="https://raw.githubusercontent.com/VPS-SCRIPT/activevpn-premium/main/PNG/1787215195806.png" crossorigin="anonymous" class="payment-qr" alt="Payment QR">
+
+                        <!-- BANK DETAILS -->
+                        <div class="bank-details">
+                            <div class="payment-title-row">
+                                <div class="icon-box">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/></svg>
+                                </div>
+                                <span>PAYMENT ( ငွေလွှဲရန် )</span>
+                            </div>
+
+                            <div class="bank-header">
+                                <div class="icon-box">
+                                    <img id="bankLogoImage" src="https://raw.githubusercontent.com/VPS-SCRIPT/activevpn-premium/main/PNG/1787665783272.png" crossorigin="anonymous" referrerpolicy="no-referrer" class="bank-logo" alt="Krungthai Bank">
+                                </div>
+                                <span class="bank-name">KRUNGTHAI BANK</span>
+                            </div>
+
+                            <div class="bank-number">6661912324</div>
+                            <div class="bank-owner">MR JUE HTET KHAING</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FOOTER SECTION -->
+                <div class="receipt-footer">
+                    <div class="slip-notice-badge">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" x2="8" y1="13" y2="13"/><line x1="16" x2="8" y1="17" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                        <span>ငွေလွှဲပြီးတိုင်းစလစ်ပို့ပေးပါ</span>
+                    </div>
+                    <p class="thank-you">THANK YOU FOR USING ACTIVE VPN</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ACTION BUTTONS -->
+        <div class="space-y-2 mt-4">
+            <button onclick="downloadSlipImage()" class="w-full bg-gradient-to-r from-emerald-500 to-teal-600 text-slate-950 font-bold py-2.5 rounded-xl flex items-center justify-center gap-2 text-sm">
+                <i class="fa-solid fa-download"></i>
+                <span id="downloadBtnText">ပုံအဖြစ် ဖုန်းထဲသိမ်းမည် (4K)</span>
+            </button>
+
+            <button onclick="copySlipText()" class="w-full bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-white font-medium py-2 rounded-xl flex items-center justify-center gap-2 text-xs">
+                <i class="fa-regular fa-copy"></i> စာသား Copy ကူးယူမည်
+            </button>
+
+            <div class="flex gap-2">
+                <a id="tgShareBtn" target="_blank" class="flex-1 bg-sky-600 text-white font-medium py-2 rounded-xl flex items-center justify-center gap-1.5 text-xs">
+                    <i class="fa-brands fa-telegram"></i> Telegram
+                </a>
+                <a id="waShareBtn" target="_blank" class="flex-1 bg-emerald-600 text-white font-medium py-2 rounded-xl flex items-center justify-center gap-1.5 text-xs">
+                    <i class="fa-brands fa-whatsapp"></i> WhatsApp
+                </a>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+<!-- =========================================================
+     ALERT MODAL
+========================================================= -->
+
+<div id="alertModal" class="hidden fixed inset-0 z-[60] flex items-center justify-center p-4">
+    <div class="absolute inset-0 modal-backdrop"></div>
+    <div class="relative bg-white dark:bg-slate-800 rounded-2xl shadow-2xl w-full max-w-sm p-6 text-center">
+        <div id="alertIconContainer" class="w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-4">
+            <i id="alertIcon" class="fa-solid text-2xl"></i>
+        </div>
+        <h3 id="alertTitle" class="text-lg font-bold mb-2">Title</h3>
+        <p id="alertMessage" class="text-slate-500 dark:text-slate-400 text-xs mb-6">Message</p>
+        <button onclick="closeAlert()" class="w-full bg-blue-600 text-white font-bold py-2.5 rounded-xl">အိုကေ</button>
+    </div>
+</div>
+
+
+<!-- =========================================================
+     CONFIRM MODAL
+========================================================= -->
+
+<div id="confirmModal" class="hidden fixed inset-0 z-[60] flex items-center justify-center p-4">
+    <div class="absolute inset-0 modal-backdrop"></div>
+    <div class="relative bg-white dark:bg-slate-800 rounded-2xl shadow-2xl w-full max-w-sm p-6 text-center">
+        <div class="w-14 h-14 rounded-full bg-red-500/20 text-red-500 flex items-center justify-center mx-auto mb-4">
+            <i class="fa-solid fa-trash-can text-2xl"></i>
+        </div>
+        <h3 id="confirmTitle" class="text-lg font-bold mb-2">ဖျက်ရန် သေချာပါသလား?</h3>
+        <p id="confirmMessage" class="text-slate-500 dark:text-slate-400 text-xs mb-6">ဒီအချက်အလက်ကို ဖျက်လိုက်ပါက ပြန်လည်ရယူ၍ မရနိုင်ပါ။</p>
+        <div class="flex gap-3">
+            <button onclick="closeConfirm()" class="flex-1 bg-slate-200 dark:bg-slate-700 py-2.5 rounded-xl">မလုပ်တော့ပါ</button>
+            <button id="confirmActionBtn" class="flex-1 bg-red-600 text-white font-bold py-2.5 rounded-xl">ဖျက်မည်</button>
+        </div>
+    </div>
+</div>
+
+<textarea id="hiddenCopyText" style="position:absolute;left:-9999px;"></textarea>
+
+
+<!-- =========================================================
+     JAVASCRIPT LOGIC
+========================================================= -->
+
+<script>
+/* =========================================================
+   THEME LOGIC
+========================================================= */
+function initTheme() {
+    const saved = localStorage.getItem("theme");
+    const icon = document.getElementById("themeIcon");
+    if (saved === "light") {
+        document.documentElement.classList.remove("dark");
+        icon.className = "fa-solid fa-sun text-lg text-amber-500";
+    } else {
+        document.documentElement.classList.add("dark");
+        icon.className = "fa-solid fa-moon text-lg text-amber-400";
+    }
+}
+
+function toggleDarkMode() {
+    const html = document.documentElement;
+    const icon = document.getElementById("themeIcon");
+    if (html.classList.contains("dark")) {
+        html.classList.remove("dark");
+        localStorage.setItem("theme", "light");
+        icon.className = "fa-solid fa-sun text-lg text-amber-500";
+    } else {
+        html.classList.add("dark");
+        localStorage.setItem("theme", "dark");
+        icon.className = "fa-solid fa-moon text-lg text-amber-400";
+    }
+}
+initTheme();
+
+/* =========================================================
+   DATE FORMATTING & UTILITIES
+========================================================= */
+function getTodayFormatted() {
+    const d = new Date();
+    return `${String(d.getDate()).padStart(2, "0")}/${String(d.getMonth() + 1).padStart(2, "0")}/${d.getFullYear()}`;
+}
+
+function formatDateForDisplay(value) {
+    if (!value) return "—";
+    if (value.includes("/")) return value;
+    const p = value.split("-");
+    if (p.length !== 3) return value;
+    return `${p[2]}/${p[1]}/${p[0]}`;
+}
+
+function parseFormattedDateToInput(value) {
+    if (!value || value === "—") return "";
+    const p = value.split("/");
+    if (p.length === 3) {
+        return `${p[2]}-${p[1].padStart(2,"0")}-${p[0].padStart(2,"0")}`;
+    }
+    return value;
+}
+
+/* =========================================================
+   DATE PICKER MODAL & PRESETS
+========================================================= */
+let activeDateContext = 'add';
+
+function openDateModal(context = 'add') {
+    activeDateContext = context;
+    document.getElementById("datePickerModal").classList.remove("hidden");
+}
+
+function closeDateModal() {
+    document.getElementById("datePickerModal").classList.add("hidden");
+}
+
+function applyDatePreset(daysToAdd) {
+    const startInput = activeDateContext === 'add' ? document.getElementById("startDate") : document.getElementById("editStartDate");
+    const expInput = activeDateContext === 'add' ? document.getElementById("expireDate") : document.getElementById("editExpireDate");
+
+    const now = new Date();
+    const startVal = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+    
+    if (startInput) startInput.value = startVal;
+
+    const future = new Date(now.getTime() + daysToAdd * 24 * 60 * 60 * 1000);
+    const expVal = `${future.getFullYear()}-${String(future.getMonth() + 1).padStart(2, "0")}-${String(future.getDate()).padStart(2, "0")}`;
+
+    if (expInput) expInput.value = expVal;
+
+    closeDateModal();
+}
+
+/* =========================================================
+   3-STAGE STATUS CHECK: GREEN (ONLINE), YELLOW (<=5 DAYS), RED (EXPIRED)
+========================================================= */
+function getValidDaysAndStatus(value) {
+    if (!value || value === "—") {
+        return { days: 0, statusType: "offline", label: "Expired", color: "red", isOnline: false };
+    }
+
+    let date;
+    if (value.includes("/")) {
+        const p = value.split("/");
+        date = new Date(p[2], p[1] - 1, p[0], 23, 59, 59);
+    } else {
+        date = new Date(value);
+    }
+
+    if (isNaN(date.getTime())) {
+        return { days: 0, statusType: "offline", label: "Expired", color: "red", isOnline: false };
+    }
+
+    const now = new Date();
+    const diff = date.getTime() - now.getTime();
+    const days = Math.ceil(diff / 86400000);
+
+    if (days <= 0) {
+        return { days: 0, statusType: "offline", label: "Offline", color: "red", isOnline: false };
+    } else if (days <= 5) {
+        return { days: days, statusType: "warning", label: `${days} Days Left`, color: "yellow", isOnline: true };
+    } else {
+        return { days: days, statusType: "online", label: `${days} Days`, color: "green", isOnline: true };
+    }
+}
+
+function formatPriceWithSymbol(rawPrice) {
+    if (!rawPrice || rawPrice === "—" || rawPrice === "-") return "—";
+    const str = String(rawPrice).trim();
+    if (str.includes("฿")) return str;
+    return `${str} ฿`;
+}
+
+/* =========================================================
+   ALERT & CONFIRM HANDLERS
+========================================================= */
+function showAlert(title, message, type = "success") {
+    const modal = document.getElementById("alertModal");
+    document.getElementById("alertTitle").innerText = title;
+    document.getElementById("alertMessage").innerText = message;
+    const container = document.getElementById("alertIconContainer");
+    const icon = document.getElementById("alertIcon");
+
+    if (type === "error") {
+        container.className = "w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-4 bg-red-500/20 text-red-500";
+        icon.className = "fa-solid fa-xmark text-2xl";
+    } else {
+        container.className = "w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-4 bg-emerald-500/20 text-emerald-500";
+        icon.className = "fa-solid fa-check text-2xl";
+    }
+    modal.classList.remove("hidden");
+}
+
+function closeAlert() {
+    document.getElementById("alertModal").classList.add("hidden");
+}
+
+let confirmCallback = null;
+function showConfirm(title, message, callback) {
+    confirmCallback = callback;
+    document.getElementById("confirmTitle").innerText = title;
+    document.getElementById("confirmMessage").innerText = message;
+    document.getElementById("confirmModal").classList.remove("hidden");
+}
+
+function closeConfirm() {
+    document.getElementById("confirmModal").classList.add("hidden");
+    confirmCallback = null;
+}
+
+document.getElementById("confirmActionBtn").addEventListener("click", function() {
+    if (confirmCallback) confirmCallback();
+    closeConfirm();
+});
+
+function dismissErrorBanner() {
+    document.getElementById("firebaseErrorBanner").classList.add("hidden");
+}
+
+/* =========================================================
+   FIREBASE REALTIME DATABASE CONFIG & ERROR RECOVERY
+========================================================= */
+const firebaseConfig = {
+    apiKey: "AIzaSyBmvehentAfiAK1pECzIHLTvqNELrVurBY",
+    authDomain: "activevpn-premium.firebaseapp.com",
+    databaseURL: "https://activevpn-premium-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "activevpn-premium",
+    storageBucket: "activevpn-premium.firebasestorage.app",
+    messagingSenderId: "847165419862",
+    appId: "1:847165419862:web:7c74d6d4a4b66f83d066f7"
+};
+
+if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+}
+const db = firebase.database();
+
+let currentDataArray = [];
+let currentTab = "all";
+let currentSlipText = "";
+let currentSlipUserObj = null;
+
+function setDefaultDates() {
+    const d = new Date();
+    const value = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+    const input = document.getElementById("startDate");
+    if (input && !input.value) input.value = value;
+}
+setDefaultDates();
+
+/* =========================================================
+   REALTIME LISTENER WITH ERROR HANDLING
+========================================================= */
+db.ref("premium_users").on("value", 
+    function(snapshot) {
+        document.getElementById("firebaseErrorBanner").classList.add("hidden");
+        const statusBadge = document.getElementById("dbStatusBadge");
+        if (statusBadge) statusBadge.classList.remove("hidden");
+
+        let data = snapshot.val();
+        if (data && typeof data === "object" && !Array.isArray(data)) {
+            data = Object.values(data);
+        }
+
+        if (data && Array.isArray(data) && data.length) {
+            currentDataArray = data.filter(u => u && u["Name"] && u["Name"] !== "empty");
+        } else {
+            currentDataArray = [];
+        }
+        renderUsersGrid();
+    }, 
+    function(error) {
+        console.error("Firebase Database Error:", error);
+        document.getElementById("firebaseErrorBanner").classList.remove("hidden");
+        const statusBadge = document.getElementById("dbStatusBadge");
+        if (statusBadge) {
+            statusBadge.className = "hidden sm:inline-flex items-center gap-1.5 bg-red-50 dark:bg-red-950/40 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800 text-[11px] font-bold py-1 px-2.5 rounded-full";
+            statusBadge.innerHTML = '<span class="w-2 h-2 rounded-full bg-red-500"></span> DB Error';
+            statusBadge.classList.remove("hidden");
+        }
+        
+        const grid = document.getElementById("usersGrid");
+        grid.innerHTML = `
+        <div class="col-span-full flex flex-col items-center justify-center py-12 text-center p-6 bg-red-500/10 rounded-2xl border border-red-500/20">
+            <i class="fa-solid fa-lock text-4xl text-red-500 mb-3"></i>
+            <h3 class="font-bold text-slate-900 dark:text-white text-base">Firebase Database ခွင့်ပြုချက် လိုအပ်နေပါသည်</h3>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-md">Firebase Console > Realtime Database > Rules တွင် <b>read / write: true</b> ဟု ပြင်ဆင်ပေးပါရန်။</p>
+            <p class="text-[11px] font-mono text-red-400 mt-2 bg-red-950/30 px-3 py-1.5 rounded-lg">${error.message}</p>
+        </div>`;
+    }
+);
+
+function switchTab(tab) {
+    currentTab = tab;
+    const tabs = ['all', 'online', 'warning', 'offline'];
+    tabs.forEach(t => {
+        const btn = document.getElementById(`tab${t.charAt(0).toUpperCase() + t.slice(1)}`);
+        if (btn) {
+            if (t === tab) {
+                btn.className = "py-2 px-2.5 rounded-xl text-xs font-bold bg-white dark:bg-slate-700 text-blue-600 dark:text-blue-400 shadow";
+            } else {
+                let colorClass = "text-slate-600 dark:text-slate-400";
+                if (t === 'online') colorClass = "text-emerald-600 dark:text-emerald-400";
+                if (t === 'warning') colorClass = "text-amber-600 dark:text-amber-400";
+                if (t === 'offline') colorClass = "text-red-600 dark:text-red-400";
+                btn.className = `py-2 px-2.5 rounded-xl text-xs font-bold ${colorClass}`;
+            }
+        }
+    });
+    renderUsersGrid();
+}
+
+/* =========================================================
+   RENDER USERS CARDS
+========================================================= */
+function renderUsersGrid() {
+    const grid = document.getElementById("usersGrid");
+    grid.innerHTML = "";
+
+    let countOnline = 0;
+    let countWarning = 0;
+    let countOffline = 0;
+
+    currentDataArray.forEach(u => {
+        const s = getValidDaysAndStatus(u["Expiration"]);
+        if (s.statusType === "online") countOnline++;
+        else if (s.statusType === "warning") countWarning++;
+        else countOffline++;
+    });
+
+    document.getElementById("totalUsersCountNav").innerText = `Total: ${currentDataArray.length}`;
+    document.getElementById("countAllBadge").innerText = currentDataArray.length;
+    document.getElementById("countOnlineBadge").innerText = countOnline;
+    document.getElementById("countWarningBadge").innerText = countWarning;
+    document.getElementById("countOfflineBadge").innerText = countOffline;
+
+    let users = currentDataArray.filter(u => {
+        const s = getValidDaysAndStatus(u["Expiration"]);
+        if (currentTab === "online") return s.statusType === "online";
+        if (currentTab === "warning") return s.statusType === "warning";
+        if (currentTab === "offline") return s.statusType === "offline";
+        return true;
+    });
+
+    if (!users.length) {
+        grid.innerHTML = `
+        <div class="col-span-full flex flex-col items-center justify-center py-16 text-slate-400">
+            <i class="fa-solid fa-folder-open text-5xl mb-4"></i>
+            <p>အသုံးပြုသူ မရှိသေးပါ</p>
+        </div>`;
+        return;
+    }
+
+    users.forEach(user => {
+        const name = user["Name"] || "-";
+        const key = user["Key"] || "-";
+        const rawPrice = user["Price"] || user["price"] || "-";
+        const priceDisplay = formatPriceWithSymbol(rawPrice);
+        const expire = user["Expiration"] || "-";
+        const status = getValidDaysAndStatus(expire);
+
+        let badgeBg = "bg-emerald-500/10 text-emerald-500 border-emerald-500/20";
+        let pulseColor = "bg-emerald-400";
+        let dotColor = "bg-emerald-500";
+        let statusText = "Online";
+
+        if (status.statusType === "warning") {
+            badgeBg = "bg-amber-500/10 text-amber-500 border-amber-500/20";
+            pulseColor = "bg-amber-400";
+            dotColor = "bg-amber-500";
+            statusText = "Expiring Soon";
+        } else if (status.statusType === "offline") {
+            badgeBg = "bg-red-500/10 text-red-500 border-red-500/20";
+            pulseColor = "bg-red-400";
+            dotColor = "bg-red-500";
+            statusText = "Offline";
+        }
+
+        const card = document.createElement("div");
+        card.className = "bg-white dark:bg-slate-800 rounded-2xl p-5 shadow-md border border-slate-200 dark:border-slate-700/80 user-card transition duration-200 hover:shadow-lg";
+        card.setAttribute("data-search", `${name} ${key}`.toLowerCase());
+
+        card.innerHTML = `
+        <div class="flex justify-between items-start mb-4">
+            <div class="flex items-center gap-3">
+                <div class="relative flex items-center justify-center w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 shadow-inner">
+                    <span class="absolute inline-flex h-full w-full rounded-xl ${pulseColor} opacity-25 pulse-radar"></span>
+                    <span class="absolute inline-flex h-2.5 w-2.5 rounded-full ${dotColor} top-1 right-1 shadow-sm"></span>
+                    <i class="fa-solid fa-shield-halved text-blue-500 text-sm"></i>
+                </div>
+
+                <div>
+                    <h3 class="font-extrabold text-slate-900 dark:text-white text-base leading-tight">${name}</h3>
+                    <div class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-bold border ${badgeBg} mt-1">
+                        <span class="relative flex h-2 w-2">
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full ${dotColor} opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-2 w-2 ${dotColor}"></span>
+                        </span>
+                        <span>${statusText}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex gap-1.5">
+                <button onclick="openEditModal('${key}')" class="p-2 bg-slate-100 dark:bg-slate-900 rounded-xl text-slate-700 dark:text-slate-300 hover:bg-blue-50 dark:hover:bg-blue-900/30 transition">
+                    <i class="fa-solid fa-pen-to-square"></i>
+                </button>
+                <button onclick="openSlipModal('${key}')" class="p-2 bg-slate-100 dark:bg-slate-900 rounded-xl text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/30 transition">
+                    <i class="fa-solid fa-ticket"></i>
+                </button>
+                <button onclick="deleteDevice('${key}')" class="p-2 bg-slate-100 dark:bg-slate-900 rounded-xl text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 transition">
+                    <i class="fa-solid fa-trash"></i>
+                </button>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2 bg-slate-50 dark:bg-slate-900/80 p-3 rounded-xl mb-3 text-xs border border-slate-100 dark:border-slate-800">
+            <div>
+                <span class="text-slate-400 block font-medium">Device ID</span>
+                <div class="font-mono text-xs text-blue-500 break-all font-semibold">${key}</div>
+            </div>
+            <div class="text-right">
+                <span class="text-slate-400 block font-medium">Price</span>
+                <div class="font-bold text-emerald-500 dark:text-emerald-400 text-sm">${priceDisplay}</div>
+            </div>
+        </div>
+
+        <div class="flex justify-between items-center text-xs">
+            <div>
+                <span class="text-slate-400 block font-medium">Expired Date</span>
+                <b class="text-slate-700 dark:text-slate-200">${expire}</b>
+            </div>
+            <div class="text-right">
+                <span class="${status.statusType === 'online' ? 'text-emerald-500' : status.statusType === 'warning' ? 'text-amber-500' : 'text-red-500'} font-bold">
+                    ${status.label}
+                </span>
+            </div>
+        </div>`;
+
+        grid.appendChild(card);
+    });
+}
+
+/* =========================================================
+   SEARCH FILTER
+========================================================= */
+function filterUsers() {
+    const q = document.getElementById("searchInput").value.toLowerCase();
+    document.querySelectorAll(".user-card").forEach(card => {
+        card.style.display = card.getAttribute("data-search").includes(q) ? "block" : "none";
+    });
+}
+
+/* =========================================================
+   ADD USER SUBMIT (NEW USERS PLACED AT THE TOP)
+========================================================= */
+document.getElementById("addUserForm").addEventListener("submit", function(e) {
+    e.preventDefault();
+
+    const btn = document.getElementById("addUserSubmitBtn");
+    const originalText = document.getElementById("submitBtnText").innerText;
+    btn.disabled = true;
+    document.getElementById("submitBtnText").innerText = "သိမ်းနေသည်...";
+
+    const name = document.getElementById("userName").value.trim();
+    const key = document.getElementById("deviceId").value.trim();
+    const priceInput = document.getElementById("userPrice").value.trim();
+    const formattedPrice = formatPriceWithSymbol(priceInput);
+    const start = document.getElementById("startDate").value;
+    const expire = document.getElementById("expireDate").value;
+
+    const user = {
+        Name: name,
+        Key: key,
+        Price: formattedPrice,
+        StartDate: formatDateForDisplay(start),
+        Expiration: formatDateForDisplay(expire),
+        Valid: getValidDaysAndStatus(expire).days
+    };
+
+    // Remove existing if duplicate, then add to top of array
+    const index = currentDataArray.findIndex(u => u && u["Key"] === key);
+    if (index >= 0) {
+        currentDataArray.splice(index, 1);
+    }
+    currentDataArray.unshift(user);
+
+    db.ref("premium_users").set(currentDataArray)
+        .then(() => {
+            btn.disabled = false;
+            document.getElementById("submitBtnText").innerText = originalText;
+            showAlert("အောင်မြင်ပါသည်", `${name} ကို Premium စာရင်းသို့ ထည့်ပြီးပါပြီ။`);
+            document.getElementById("addUserForm").reset();
+            setDefaultDates();
+        })
+        .catch(err => {
+            btn.disabled = false;
+            document.getElementById("submitBtnText").innerText = originalText;
+            console.error("Save Error:", err);
+            showAlert("သိမ်းဆည်းမရပါ", `Firebase Error: ${err.message}`, "error");
+        });
+});
+
+/* =========================================================
+   EDIT USER MODAL LOGIC
+========================================================= */
+function openEditModal(key) {
+    const user = currentDataArray.find(u => u && u["Key"] === key);
+    if (!user) return;
+
+    document.getElementById("editOriginalKey").value = key;
+    document.getElementById("editUserName").value = user["Name"] || "";
+    document.getElementById("editDeviceId").value = user["Key"] || "";
+    document.getElementById("editPrice").value = user["Price"] || user["price"] || "";
+    document.getElementById("editStartDate").value = parseFormattedDateToInput(user["StartDate"] || getTodayFormatted());
+    document.getElementById("editExpireDate").value = parseFormattedDateToInput(user["Expiration"]);
+
+    document.getElementById("editModal").classList.remove("hidden");
+}
+
+function closeEditModal() {
+    document.getElementById("editModal").classList.add("hidden");
+}
+
+document.getElementById("editUserForm").addEventListener("submit", function(e) {
+    e.preventDefault();
+    const original = document.getElementById("editOriginalKey").value;
+    const priceInput = document.getElementById("editPrice").value.trim();
+
+    const user = {
+        Name: document.getElementById("editUserName").value.trim(),
+        Key: document.getElementById("editDeviceId").value.trim(),
+        Price: formatPriceWithSymbol(priceInput),
+        StartDate: formatDateForDisplay(document.getElementById("editStartDate").value),
+        Expiration: formatDateForDisplay(document.getElementById("editExpireDate").value)
+    };
+
+    user.Valid = getValidDaysAndStatus(user.Expiration).days;
+
+    const index = currentDataArray.findIndex(u => u && u["Key"] === original);
+    if (index >= 0) {
+        currentDataArray[index] = user;
+        db.ref("premium_users").set(currentDataArray)
+            .then(() => {
+                closeEditModal();
+                showAlert("ပြင်ဆင်ပြီးပါပြီ", "အကောင့်အချက်အလက်များကို သိမ်းဆည်းပြီးပါပြီ။");
+            })
+            .catch(err => {
+                showAlert("ပြင်ဆင်မရပါ", err.message, "error");
+            });
+    }
+});
+
+/* =========================================================
+   RECEIPT SLIP MODAL DISPLAY
+========================================================= */
+function openSlipModal(key) {
+    const user = currentDataArray.find(u => u && u["Key"] === key);
+    if (!user) return;
+
+    currentSlipUserObj = user;
+
+    const name = user["Name"] || "—";
+    const device = user["Key"] || "—";
+    const rawPrice = user["Price"] || user["price"] || "—";
+    const priceDisplay = formatPriceWithSymbol(rawPrice);
+    const start = (user["StartDate"] && user["StartDate"] !== "—") ? user["StartDate"] : (user["startDate"] || getTodayFormatted());
+    const expire = user["Expiration"] || user["expireDate"] || "—";
+
+    document.getElementById("slipName").innerText = name;
+    document.getElementById("slipKey").innerText = device;
+    document.getElementById("slipPrice").innerText = priceDisplay;
+    document.getElementById("slipStart").innerText = start;
+    document.getElementById("slipExp").innerText = expire;
+
+    currentSlipText = `ACTIVE VPN VIP
+
+အမည် : ${name}
+Device ID : ${device}
+Price : ${priceDisplay}
+Start Date : ${start}
+Expired Date : ${expire}
+
+PAYMENT
+KRUNGTHAI BANK
+6661912324
+MR JUE HTET KHAING
+
+ငွေလွှဲပြီးတိုင်းစလစ်ပို့ပေးပါ
+THANK YOU FOR USING ACTIVE VPN`;
+
+    const encoded = encodeURIComponent(currentSlipText);
+    document.getElementById("tgShareBtn").href = `https://t.me/share/url?url=&text=${encoded}`;
+    document.getElementById("waShareBtn").href = `https://api.whatsapp.com/send?text=${encoded}`;
+
+    document.getElementById("slipModal").classList.remove("hidden");
+    preloadReceiptImages();
+}
+
+function closeSlipModal() {
+    document.getElementById("slipModal").classList.add("hidden");
+}
+
+/* =========================================================
+   RECEIPT IMAGE CAPTURE & DOWNLOAD (HTML-TO-IMAGE ENGINE)
+========================================================= */
+function waitForImage(img) {
+    return new Promise(resolve => {
+        if (!img) { resolve(); return; }
+        if (img.complete) { resolve(); return; }
+        img.onload = () => resolve();
+        img.onerror = () => resolve();
+    });
+}
+
+async function preloadReceiptImages() {
+    await Promise.all([
+        waitForImage(document.getElementById("bankLogoImage")),
+        waitForImage(document.getElementById("paymentQrImage")),
+        waitForImage(document.querySelector("#receiptCardToCapture .receipt-logo"))
+    ]);
+}
+
+async function downloadSlipImage() {
+    const card = document.getElementById("receiptCardToCapture");
+    const btn = document.getElementById("downloadBtnText");
+    btn.innerText = "ပုံထုတ်နေသည်...";
+
+    try {
+        if (document.fonts) {
+            await document.fonts.ready;
+        }
+        await preloadReceiptImages();
+        await new Promise(r => setTimeout(r, 200));
+
+        const dataUrl = await htmlToImage.toPng(card, {
+            quality: 1.0,
+            pixelRatio: 3,
+            backgroundColor: "#020617",
+            cacheBust: true,
+            style: {
+                margin: "0",
+                transform: "none"
+            }
+        });
+
+        const link = document.createElement("a");
+        const name = currentSlipUserObj ? (currentSlipUserObj["Name"] || "User") : "User";
+        link.download = `ACTIVE_VPN_${name}_Receipt.png`;
+        link.href = dataUrl;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        btn.innerText = "ပုံအဖြစ် ဖုန်းထဲသိမ်းမည် (4K)";
+        showAlert("အောင်မြင်ပါသည်", "Receipt ပုံကို 4K PNG အဖြစ် သိမ်းပြီးပါပြီ။");
+    } catch(error) {
+        console.error("Image generation error:", error);
+        btn.innerText = "ပုံအဖြစ် ဖုန်းထဲသိမ်းမည် (4K)";
+        showAlert("အမှားဖြစ်နေပါသည်", "Receipt ပုံထုတ်ရာတွင် အမှားဖြစ်နေပါသည်။", "error");
+    }
+}
+
+/* =========================================================
+   TEXT COPY & DELETE
+========================================================= */
+function copySlipText() {
+    const ta = document.getElementById("hiddenCopyText");
+    ta.value = currentSlipText;
+    ta.select();
+    document.execCommand("copy");
+    showAlert("Copy ကူးပြီးပါပြီ", "Receipt စာသားကို Copy ကူးပြီးပါပြီ။");
+}
+
+function deleteDevice(key) {
+    showConfirm("ဖျက်ရန် သေချာပါသလား?", `Device ID: ${key} ကို ဖျက်မည်မှာ သေချာပါသလား?`, function() {
+        const index = currentDataArray.findIndex(u => u && u["Key"] === key);
+        if (index < 0) return;
+
+        currentDataArray.splice(index, 1);
+        db.ref("premium_users").set(currentDataArray)
+            .then(() => {
+                showAlert("ဖျက်ပြီးပါပြီ", "User ကို စာရင်းမှ ဖယ်ရှားပြီးပါပြီ။");
+            })
+            .catch(err => {
+                showAlert("ဖျက်မရပါ", err.message, "error");
+            });
+    });
+}
+
+/* =========================================================
+   SERVICE WORKER
+========================================================= */
+if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("sw.js")
+        .then(() => console.log("✅ SW registered"))
+        .catch(err => console.warn("SW registration failed:", err));
+}
+</script>
+
+</body>
+</html>
