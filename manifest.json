@@ -1,12 +1,12 @@
 {
-  "name": "ACTIVE VPN Admin Panel Pro",
+  "name": "ACTIVE VPN Admin",
   "short_name": "ACTIVE VPN",
-  "description": "ACTIVE VPN Premium User Management Admin Panel",
-  "start_url": "index.html",
+  "description": "Admin panel for managing ACTIVE VPN premium users",
+  "start_url": "/",
   "display": "standalone",
+  "orientation": "portrait",
   "background_color": "#020617",
   "theme_color": "#020617",
-  "orientation": "portrait-primary",
   "icons": [
     {
       "src": "https://raw.githubusercontent.com/VPS-SCRIPT/activevpn-premium/main/PNG/1787574190521.png",
@@ -19,6 +19,13 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Manage Users",
+      "url": "/",
+      "description": "View and manage premium users"
     }
   ]
 }
