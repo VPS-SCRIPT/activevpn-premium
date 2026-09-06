@@ -1,0 +1,795 @@
+/* =========================================================
+   GLOBAL STYLES
+========================================================= */
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    min-height: 100vh;
+}
+
+
+/* =========================================================
+   CUSTOM SCROLLBAR
+========================================================= */
+
+::-webkit-scrollbar {
+    width: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #475569;
+    border-radius: 8px;
+}
+
+
+/* =========================================================
+   TICKET NOTCH (လက်မှတ်အစွန်းဝိုင်းပုံစံ)
+========================================================= */
+
+.ticket-notch {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 27px;
+    height: 27px;
+    border-radius: 50%;
+    z-index: 30;
+    transition: all 0.3s ease;
+}
+
+.dark-slip-mode .ticket-notch {
+    background: #020617;
+    border: 2px solid rgba(59, 130, 246, 0.42);
+}
+
+.light-slip-mode .ticket-notch {
+    background: #f1f5f9;
+    border: 2px solid rgba(59, 130, 246, 0.35);
+}
+
+.ticket-notch-left {
+    left: -14px;
+}
+
+.ticket-notch-right {
+    right: -14px;
+}
+
+
+/* =========================================================
+   RECEIPT CARD CONTAINER & SHADOWS
+========================================================= */
+
+#receiptCardToCapture {
+    width: 100%;
+    max-width: 420px;
+    margin: 0 auto;
+    padding: 0;
+    border-radius: 24px;
+    position: relative;
+    overflow: visible !important;
+    outline: none !important;
+    transition: background 0.3s ease, border-color 0.3s ease;
+}
+
+/* DARK SLIP THEME */
+.dark-slip-mode#receiptCardToCapture {
+    background: #020617 !important;
+    border: 2px solid rgba(59, 130, 246, 0.40);
+    box-shadow: 0 20px 35px -10px rgba(0, 0, 0, 0.7) !important;
+}
+
+.dark-slip-mode .receipt-inner {
+    background: #020617 !important;
+    border-radius: 22px;
+}
+
+.dark-slip-mode .receipt-header {
+    border-bottom: 1px solid rgba(59, 130, 246, 0.25);
+}
+
+.dark-slip-mode .receipt-title {
+    color: #fbbf24;
+    text-shadow: 0 2px 8px rgba(251, 191, 36, 0.35);
+}
+
+.dark-slip-mode .receipt-subtitle {
+    color: #34d399;
+    text-shadow: 0 1px 4px rgba(52, 211, 153, 0.3);
+}
+
+.dark-slip-mode .receipt-details {
+    border-bottom: 1px solid rgba(30, 41, 59, 0.8);
+}
+
+.dark-slip-mode .receipt-row {
+    border-bottom: 1px solid rgba(30, 41, 59, 0.78);
+}
+
+.dark-slip-mode .receipt-label {
+    color: #94a3b8;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+.dark-slip-mode .receipt-svg-icon {
+    color: #60a5fa;
+    filter: drop-shadow(0 1px 3px rgba(96, 165, 250, 0.4));
+}
+
+.dark-slip-mode .receipt-value {
+    color: #f8fafc;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.7);
+}
+
+.dark-slip-mode .receipt-value.key {
+    color: #fcd34d;
+    text-shadow: 0 1px 4px rgba(252, 211, 77, 0.3);
+}
+
+.dark-slip-mode .receipt-value.price-value {
+    color: #34d399 !important;
+    text-shadow: 0 1px 6px rgba(52, 211, 153, 0.4);
+}
+
+.dark-slip-mode .payment-section {
+    border-top: 1px dashed rgba(59, 130, 246, 0.35);
+}
+
+.dark-slip-mode .payment-title-row {
+    color: #fbbf24;
+    text-shadow: 0 1px 4px rgba(251, 191, 36, 0.3);
+}
+
+.dark-slip-mode .bank-name {
+    color: #94a3b8;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+}
+
+.dark-slip-mode .bank-number {
+    color: #fcd34d;
+    text-shadow: 0 1px 5px rgba(252, 211, 77, 0.35);
+}
+
+.dark-slip-mode .bank-owner {
+    color: #ffffff;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+}
+
+.dark-slip-mode .receipt-footer {
+    border-top: 1px dashed rgba(59, 130, 246, 0.35);
+}
+
+.dark-slip-mode .slip-notice-badge {
+    background: rgba(245, 158, 11, 0.12);
+    border: 1.5px solid rgba(245, 158, 11, 0.45);
+    color: #fbbf24;
+    box-shadow: 0 2px 10px rgba(245, 158, 11, 0.15);
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+.dark-slip-mode .thank-you {
+    color: #94a3b8;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+
+/* LIGHT SLIP THEME */
+.light-slip-mode#receiptCardToCapture {
+    background: #ffffff !important;
+    border: 2px solid rgba(59, 130, 246, 0.35);
+    box-shadow: 0 20px 35px -10px rgba(100, 116, 139, 0.2) !important;
+}
+
+.light-slip-mode .receipt-inner {
+    background: #ffffff !important;
+    border-radius: 22px;
+}
+
+.light-slip-mode .receipt-header {
+    border-bottom: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.light-slip-mode .receipt-title {
+    color: #1e3a8a;
+    text-shadow: 0 1px 3px rgba(30, 58, 138, 0.2);
+}
+
+.light-slip-mode .receipt-subtitle {
+    color: #059669;
+    text-shadow: 0 1px 2px rgba(5, 150, 105, 0.15);
+}
+
+.light-slip-mode .receipt-details {
+    border-bottom: 1px solid rgba(226, 232, 240, 0.9);
+}
+
+.light-slip-mode .receipt-row {
+    border-bottom: 1px solid rgba(226, 232, 240, 0.85);
+}
+
+.light-slip-mode .receipt-label {
+    color: #475569;
+    text-shadow: 0 1px 1px rgba(255, 255, 255, 0.8);
+}
+
+.light-slip-mode .receipt-svg-icon {
+    color: #2563eb;
+    filter: drop-shadow(0 1px 2px rgba(37, 99, 235, 0.2));
+}
+
+.light-slip-mode .receipt-value {
+    color: #0f172a;
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
+}
+
+.light-slip-mode .receipt-value.key {
+    color: #b45309;
+    text-shadow: 0 1px 1px rgba(180, 83, 9, 0.1);
+}
+
+.light-slip-mode .receipt-value.price-value {
+    color: #059669 !important;
+    text-shadow: 0 1px 3px rgba(5, 150, 105, 0.2);
+}
+
+.light-slip-mode .payment-section {
+    border-top: 1px dashed rgba(59, 130, 246, 0.3);
+}
+
+.light-slip-mode .payment-title-row {
+    color: #b45309;
+    text-shadow: 0 1px 2px rgba(180, 83, 9, 0.15);
+}
+
+.light-slip-mode .bank-name {
+    color: #475569;
+    text-shadow: 0 1px 1px rgba(255, 255, 255, 0.8);
+}
+
+.light-slip-mode .bank-number {
+    color: #0284c7;
+    text-shadow: 0 1px 2px rgba(2, 132, 199, 0.2);
+}
+
+.light-slip-mode .bank-owner {
+    color: #0f172a;
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
+}
+
+.light-slip-mode .receipt-footer {
+    border-top: 1px dashed rgba(59, 130, 246, 0.3);
+}
+
+.light-slip-mode .slip-notice-badge {
+    background: rgba(245, 158, 11, 0.1);
+    border: 1.5px solid rgba(245, 158, 11, 0.5);
+    color: #b45309;
+    box-shadow: 0 2px 8px rgba(245, 158, 11, 0.08);
+}
+
+.light-slip-mode .thank-you {
+    color: #64748b;
+    text-shadow: 0 1px 1px rgba(255, 255, 255, 0.6);
+}
+
+
+/* =========================================================
+   RECEIPT INNER CONTENT
+========================================================= */
+
+.receipt-inner {
+    padding: 22px;
+    overflow: visible;
+}
+
+
+/* =========================================================
+   HEADER SECTION
+========================================================= */
+
+.receipt-header {
+    text-align: center;
+    padding-bottom: 17px;
+}
+
+.receipt-logo {
+    width: 64px;
+    height: 64px;
+    object-fit: contain;
+    display: block;
+    margin: 0 auto 9px auto;
+    border-radius: 50%;
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.25));
+}
+
+.receipt-title {
+    margin: 0;
+    font-size: 23px;
+    line-height: 1.25;
+    font-weight: 900;
+    letter-spacing: 0.035em;
+}
+
+.receipt-subtitle {
+    margin: 7px 0 0 0;
+    font-size: 10px;
+    line-height: 1.2;
+    font-family: monospace;
+    letter-spacing: 0.19em;
+}
+
+
+/* =========================================================
+   USER DETAILS ROWS
+========================================================= */
+
+.receipt-details {
+    margin-top: 14px;
+}
+
+.receipt-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    min-height: 48px;
+    padding: 8px 0;
+    gap: 12px;
+}
+
+.receipt-row:last-child {
+    border-bottom: none;
+}
+
+
+/* =========================================================
+   LABEL & SVG ICON
+========================================================= */
+
+.receipt-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 12px;
+    font-weight: 800;
+    text-transform: uppercase;
+    white-space: nowrap;
+    flex-shrink: 0;
+    line-height: 1;
+}
+
+.receipt-svg-icon {
+    width: 22px;
+    height: 22px;
+    flex: 0 0 22px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+
+/* =========================================================
+   VALUE TEXT
+========================================================= */
+
+.receipt-value {
+    flex: 1;
+    min-width: 0;
+    text-align: right;
+    font-size: 14px;
+    line-height: 1.35;
+    font-weight: 800;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
+.receipt-value.key {
+    font-family: "Courier New", monospace;
+    font-size: 13px;
+    letter-spacing: 0.035em;
+}
+
+.receipt-value.price-value {
+    font-weight: 900;
+    font-size: 14px;
+}
+
+
+/* =========================================================
+   PAYMENT SECTION
+========================================================= */
+
+.payment-section {
+    margin-top: 16px;
+    padding-top: 14px;
+}
+
+.payment-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    gap: 16px;
+    padding: 0 4px;
+}
+
+.payment-qr {
+    width: 85px !important;
+    height: 85px !important;
+    min-width: 85px !important;
+    min-height: 85px !important;
+    object-fit: contain;
+    display: block;
+    flex: 0 0 85px;
+    padding: 3px;
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+}
+
+.bank-details {
+    min-width: 0;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+.icon-box {
+    width: 28px;
+    height: 28px;
+    min-width: 28px;
+    min-height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 28px;
+}
+
+.payment-title-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 900;
+    line-height: 1;
+    margin-bottom: 6px;
+}
+
+.bank-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    margin-bottom: 2px;
+}
+
+.bank-logo {
+    width: 28px !important;
+    height: 28px !important;
+    min-width: 28px !important;
+    min-height: 28px !important;
+    object-fit: contain;
+    display: block;
+    border-radius: 50%;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+}
+
+.bank-name {
+    display: flex;
+    align-items: center;
+    font-size: 11px;
+    line-height: 1;
+    font-weight: 900;
+    letter-spacing: 0.03em;
+    white-space: nowrap;
+    margin: 0;
+}
+
+.bank-number {
+    font-family: "Courier New", monospace;
+    font-size: 16px;
+    line-height: 1.2;
+    font-weight: 900;
+    letter-spacing: 0.06em;
+    white-space: nowrap;
+    padding-left: 36px;
+    margin-top: 2px;
+    margin-bottom: 5px;
+}
+
+.bank-owner {
+    font-size: 11px;
+    line-height: 1.2;
+    font-weight: 800;
+    white-space: nowrap;
+    letter-spacing: 0.02em;
+    padding-left: 36px;
+    margin-top: 0px;
+}
+
+
+/* =========================================================
+   FOOTER & SLIP NOTICE
+========================================================= */
+
+.receipt-footer {
+    margin-top: 16px;
+    padding-top: 14px;
+    text-align: center;
+    background: transparent !important;
+}
+
+.slip-notice-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    margin-bottom: 10px;
+}
+
+.thank-you {
+    margin: 0;
+    font-size: 9px;
+    line-height: 1.2;
+    font-family: monospace;
+    letter-spacing: 0.15em;
+}
+
+
+/* =========================================================
+   ANIMATED RADAR & LIVE BADGES
+========================================================= */
+
+@keyframes radarPulse {
+    0% {
+        transform: scale(0.95);
+        opacity: 0.8;
+    }
+    50% {
+        transform: scale(1.35);
+        opacity: 0;
+    }
+    100% {
+        transform: scale(0.95);
+        opacity: 0;
+    }
+}
+
+.pulse-radar {
+    animation: radarPulse 1.8s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+
+/* =========================================================
+   MODALS & SPINNER
+========================================================= */
+
+.modal-backdrop {
+    background: rgba(15, 23, 42, 0.78);
+    backdrop-filter: blur(8px);
+}
+
+.spinner {
+    border: 3px solid rgba(59, 130, 246, 0.15);
+    border-top-color: #3b82f6;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    animation: spin .7s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+
+/* =========================================================
+   MOBILE RESPONSIVE
+========================================================= */
+
+@media(max-width:480px) {
+    #receiptCardToCapture {
+        max-width: 100%;
+        border-radius: 22px;
+    }
+    .receipt-inner {
+        padding: 18px;
+        border-radius: 20px;
+    }
+    .receipt-row {
+        min-height: 44px;
+    }
+    .receipt-label {
+        font-size: 11px;
+    }
+    .receipt-value {
+        font-size: 13px;
+    }
+    .payment-qr {
+        width: 78px !important;
+        height: 78px !important;
+        flex: 0 0 78px;
+    }
+    .bank-number {
+        font-size: 14px;
+        padding-left: 34px;
+        margin-bottom: 4px;
+    }
+    .bank-owner {
+        font-size: 10px;
+        padding-left: 34px;
+    }
+    .slip-notice-badge {
+        font-size: 11.5px;
+        padding: 7px 12px;
+    }
+}
+
+
+/* =========================================================
+   QR SCANNER MODAL
+========================================================= */
+
+#qrScannerContainer video {
+    width: 100% !important;
+    height: auto !important;
+    max-height: 420px;
+    border-radius: 16px;
+    object-fit: cover;
+}
+
+#qrScannerContainer #reader {
+    width: 100%;
+}
+
+#qrScannerContainer #reader__scan_region {
+    min-height: 280px;
+}
+
+
+/* =========================================================
+   CHARTS CONTAINER
+========================================================= */
+
+.chart-container {
+    position: relative;
+    height: 200px;
+    width: 100%;
+}
+
+
+/* =========================================================
+   REMINDER MODAL
+========================================================= */
+
+.reminder-text {
+    font-family: 'Courier New', monospace;
+    white-space: pre-wrap;
+    word-break: break-word;
+    font-size: 13px;
+    line-height: 1.7;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+
+/* =========================================================
+   RENEW BUTTON PULSE
+========================================================= */
+
+@keyframes renewPulse {
+    0%,
+    100% {
+        box-shadow: 0 0 0 0 rgba(251, 191, 36, 0.4);
+    }
+    50% {
+        box-shadow: 0 0 0 8px rgba(251, 191, 36, 0);
+    }
+}
+
+.renew-btn-pulse {
+    animation: renewPulse 2s ease-in-out infinite;
+}
+
+.renew-btn-pulse:hover {
+    animation: none;
+}
+
+
+/* =========================================================
+   EXPORT / IMPORT BUTTONS
+========================================================= */
+
+.data-tool-btn {
+    transition: all 0.2s ease;
+}
+
+.data-tool-btn:hover {
+    transform: translateY(-1px);
+}
+
+
+/* =========================================================
+   SCROLLBAR FOR REMINDER
+========================================================= */
+
+.reminder-text::-webkit-scrollbar {
+    width: 4px;
+}
+
+.reminder-text::-webkit-scrollbar-thumb {
+    background: #475569;
+    border-radius: 8px;
+}
+
+
+/* =========================================================
+   PWA INSTALL BUTTON GLOW
+========================================================= */
+
+.pwa-install-btn {
+    background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+    transition: all 0.3s ease;
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+}
+
+.pwa-install-btn:hover {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 0 30px rgba(59, 130, 246, 0.5);
+}
+
+.pwa-install-btn:active {
+    transform: scale(0.95);
+}
+
+/* =========================================================
+   PWA FALLBACK INSTRUCTION MODAL
+========================================================= */
+
+.pwa-instruction-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(203, 213, 225, 0.2);
+}
+
+.pwa-instruction-step:last-child {
+    border-bottom: none;
+}
+
+.pwa-step-number {
+    width: 28px;
+    height: 28px;
+    min-width: 28px;
+    background: #3b82f6;
+    color: #fff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 900;
+}
