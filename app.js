@@ -732,7 +732,7 @@ function openSlipModal(key) {
         အမည် : ${name}
         Device ID : ${device}
         စျေးနှုန်း : ${priceDisplay}
-        ပလန်ဆို : ${note}
+        ပလန် : ${note}
         စတင်သည့်ရက် : ${start}
         သက်တမ်းကုန်ရက် : ${expire}
 
